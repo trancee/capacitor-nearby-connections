@@ -3,12 +3,58 @@
 import type { PermissionState, PluginListenerHandle } from '@capacitor/core';
 
 export interface PermissionStatus {
+  /**
+   * `NEARBY_WIFI_DEVICES` Required to be able to advertise and connect to nearby devices via Wi-Fi.
+   *
+   * @since 1.0.0
+   */
   wifiNearby: PermissionState;
+  /**
+   * `ACCESS_WIFI_STATE` Allows applications to access information about Wi-Fi networks.
+   * `CHANGE_WIFI_STATE` Allows applications to change Wi-Fi connectivity state.
+   *
+   * @since 1.0.0
+   */
   wifiState: PermissionState;
+  /**
+   * `BLUETOOTH_ADVERTISE` Required to be able to advertise to nearby Bluetooth devices.
+   * `BLUETOOTH_CONNECT` Required to be able to connect to paired Bluetooth devices.
+   * `BLUETOOTH_SCAN` Required to be able to discover and pair nearby Bluetooth devices.
+   *
+   * @since 1.0.0
+   */
   bluetoothNearby: PermissionState;
+  /**
+   * `BLUETOOTH` Allows applications to connect to paired bluetooth devices.
+   * `BLUETOOTH_ADMIN` Allows applications to discover and pair bluetooth devices.
+   *
+   * @since 1.0.0
+   */
   bluetoothLegacy: PermissionState;
-  locationFine: PermissionState;
+  /**
+   * `ACCESS_FINE_LOCATION` Allows an app to access precise location.
+   *
+   * @since 1.0.0
+   */
+  location: PermissionState;
+  /**
+   * `ACCESS_COARSE_LOCATION` Allows an app to access approximate location.
+   *
+   * @since 1.0.0
+   */
   locationCoarse: PermissionState;
+}
+
+export type NearbyConnectionPermissionType =
+  | 'wifiNearby'
+  | 'wifiState'
+  | 'bluetoothNearby'
+  | 'bluetoothLegacy'
+  | 'location'
+  | 'locationCoarse';
+
+export interface NearbyConnectionsPermissions {
+  permissions: NearbyConnectionPermissionType[];
 }
 
 declare module '@capacitor/cli' {
@@ -160,7 +206,7 @@ export interface InitializeOptions {
   lowPower?: boolean;
 }
 
-type Base64 = string;
+export type Base64 = string;
 
 export interface PublishOptions {
   /**
@@ -300,8 +346,18 @@ export interface NearbyConnectionsPlugin {
    */
   status(): Promise<Status>;
 
+  /**
+   * Check for the appropriate permissions to use Nearby.
+   *
+   * @since 1.0.0
+   */
   checkPermissions(): Promise<PermissionStatus>;
-  requestPermissions(): Promise<PermissionStatus>;
+  /**
+   * Request the appropriate permissions to use Nearby.
+   *
+   * @since 1.0.0
+   */
+  requestPermissions(permissions?: NearbyConnectionsPermissions): Promise<PermissionStatus>;
 
   /**
    * Called when permission is granted or revoked for this app to use Nearby.
