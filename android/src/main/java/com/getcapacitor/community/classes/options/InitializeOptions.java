@@ -1,14 +1,12 @@
-package com.getcapacitor.community;
+package com.getcapacitor.community.classes.options;
 
-import static com.getcapacitor.community.NearbyConnectionsHelper.toConnectionType;
 import static com.getcapacitor.community.NearbyConnectionsHelper.toStrategy;
 
 import android.util.Base64;
 import androidx.annotation.Nullable;
-import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.Strategy;
 
-public class NearbyConnectionsConfig {
+public class InitializeOptions {
 
     @Nullable
     private String endpointName;
@@ -23,13 +21,30 @@ public class NearbyConnectionsConfig {
     private Boolean lowPower;
 
     @Nullable
-    private Integer connectionType;
-
-    @Nullable
     private Boolean autoConnect;
 
     @Nullable
-    private Payload payload;
+    private byte[] payload;
+
+    public InitializeOptions(
+        @Nullable String endpointName,
+        @Nullable String serviceId,
+        @Nullable String strategy,
+        @Nullable Boolean lowPower,
+        @Nullable Boolean autoConnect,
+        @Nullable byte[] payload
+    ) {
+        this.setEndpointName(endpointName);
+
+        this.setServiceId(serviceId);
+
+        this.setStrategy(strategy);
+
+        this.setLowPower(lowPower);
+
+        this.setAutoConnect(autoConnect);
+        this.setPayload(payload);
+    }
 
     @Nullable
     public String getEndpointName() {
@@ -52,17 +67,12 @@ public class NearbyConnectionsConfig {
     }
 
     @Nullable
-    public Integer getConnectionType() {
-        return connectionType;
-    }
-
-    @Nullable
     public Boolean getAutoConnect() {
         return autoConnect;
     }
 
     @Nullable
-    public Payload getPayload() {
+    public byte[] getPayload() {
         return payload;
     }
 
@@ -82,16 +92,11 @@ public class NearbyConnectionsConfig {
         this.lowPower = lowPower;
     }
 
-    public void setConnectionType(@Nullable String connectionType) {
-        this.connectionType = toConnectionType(connectionType);
-    }
-
     public void setAutoConnect(@Nullable Boolean autoConnect) {
         this.autoConnect = autoConnect;
     }
 
-    public void setPayload(@Nullable String payload) {
-        if (payload == null) this.payload = null;
-        else this.payload = Payload.fromBytes(Base64.decode(payload, Base64.NO_WRAP));
+    public void setPayload(@Nullable byte[] payload) {
+        this.payload = payload;
     }
 }

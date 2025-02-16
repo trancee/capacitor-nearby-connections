@@ -1,26 +1,152 @@
 <!doctype html>
 <html lang="en" dir="ltr" class="hydrated">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Example Capacitor App</title>
-    <meta
-      name="viewport"
-      content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <meta name="format-detection" content="telephone=no" />
-  </head>
-  <body>
-    <main>
-      <h1>Capacitor Test Plugin Project</h1>
-      <p>
-        This project can be used to test out the functionality of your plugin. Nothing in the
-        <em>example-app/</em> folder will be published to npm when using this template, so you can create away!
-      </p>
-      <label for="echoInput">Echo Text:</label>
-      <input type="text" id="echoInput" name="echoInput" value="Hello World!" />
-      <button onclick="testEcho()">Click Me!</button>
-    </main>
 
-    <script src="./js/example.js" type="module"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <title>Example Capacitor App</title>
+  <meta name="viewport"
+    content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="format-detection" content="telephone=no" />
+  <style>
+    html,
+    body {
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>Capacitor Test Plugin Project</h1>
+    <p>
+      This project can be used to test out the functionality of your plugin. Nothing in the
+      <em>example-app/</em> folder will be published to npm when using this template, so you can create away!
+    </p>
+
+    <div style="width: 50%; float: left;">
+      <fieldset>
+        <legend>Initializes Nearby Connections for advertising and discovering of endpoints.</legend>
+        <label for="initialize-endpointName">A human readable name for this endpoint, to appear on the remote
+          device.</label><br>
+        <input type="text" id="initialize-endpointName" name="initialize-endpointName" value="My App" /><br>
+        <label for="initialize-serviceId">An identifier to advertise your app to other endpoints.</label><br>
+        <input type="text" id="initialize-serviceId" name="initialize-serviceId" value="com.example.myapp" /><br>
+        <label for="initialize-strategy">Sets the `Strategy` to be used when discovering or advertising to Nearby
+          devices.</label><br>
+        <select id="initialize-strategy" name="initialize-strategy">
+          <option value="cluster">Cluster</option>
+          <option value="star">Star</option>
+          <option value="pointToPoint">Point to Point</option>
+        </select><br>
+        <select id="initialize-lowPower" name="initialize-lowPower">
+          <option value=""></option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+        <label for="initialize-lowPower">Sets whether low power should be used.</label><br>
+        <label for="initialize-connectionType">Sets whether the client should disrupt the current connection to
+          optimize the transfer or not.</label><br>
+        <select id="initialize-connectionType" name="initialize-connectionType">
+          <option value=""></option>
+          <option value="balanced">BALANCED</option>
+          <option value="disruptive">DISRUPTIVE</option>
+          <option value="nonDisruptive">NON_DISRUPTIVE</option>
+        </select><br>
+        <select id="initialize-autoConnect" name="initialize-autoConnect">
+          <option value=""></option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+        <label for="initialize-autoConnect">Automatically accept the connection on both sides.</label><br>
+        <label for="initialize-payload">What payload to send when automatically connecting to each other.</label><br>
+        <input type="text" id="initialize-payload" name="initialize-payload" value="" /><br>
+        <button onclick="testInitialize()">Initialize</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Stops and resets advertising and discovering of endpoints.</legend>
+        <button onclick="testReset()">Reset</button>
+      </fieldset>
+
+      <hr>
+
+      <fieldset>
+        <legend>Starts advertising an endpoint for a local app.</legend>
+        <label for="startAdvertising-endpointName">A human readable name for this endpoint, to appear on the remote
+          device.</label><br>
+        <input type="text" id="startAdvertising-endpointName" name="startAdvertising-endpointName" value="" /><br>
+        <label for="startAdvertising-connectionType">Sets whether the client should disrupt the current connection to
+          optimize the transfer or not.</label><br>
+        <select id="startAdvertising-connectionType" name="startAdvertising-connectionType">
+          <option value=""></option>
+          <option value="balanced">BALANCED</option>
+          <option value="disruptive">DISRUPTIVE</option>
+          <option value="nonDisruptive">NON_DISRUPTIVE</option>
+        </select><br>
+        <select id="startAdvertising-lowPower" name="startAdvertising-lowPower">
+          <option value=""></option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+        <label for="startAdvertising-lowPower">Sets whether low power should be used.</label><br>
+        <button onclick="testStartAdvertising()">Start Advertising</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Stops advertising a local endpoint.</legend>
+        <button onclick="testStopAdvertising()">Stop Advertising</button>
+      </fieldset>
+
+      <hr>
+
+      <fieldset>
+        <legend>Starts discovery for remote endpoints with the specified service ID.</legend>
+        <select id="startDiscovery-lowPower" name="startDiscovery-lowPower">
+          <option value=""></option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+        <label for="startDiscovery-lowPower">Sets whether low power should be used.</label><br>
+        <button onclick="testStartDiscovery()">Start Discovery</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Stops discovery for remote endpoints.</legend>
+        <button onclick="testStopDiscovery()">Stop Discovery</button>
+      </fieldset>
+
+      <hr>
+
+      <fieldset>
+        <legend>Returns advertising and discovering status, and discovered endpoints.</legend>
+        <button onclick="testStatus()">Status</button>
+      </fieldset>
+
+      <hr>
+
+      <fieldset>
+        <button onclick="testCheckPermissions()">Check Permissions</button>
+        <br>
+        <select id="aliases" name="aliases" multiple>
+          <option value="wifiNearby">WiFi Nearby</option>
+          <option value="wifiState">WiFi State</option>
+          <option value="bluetoothNearby">Bluetooth Nearby</option>
+          <option value="bluetoothLegacy">Bluetooth Legacy</option>
+          <option value="location">Location</option>
+          <option value="locationCoarse">Location Coarse</option>
+        </select><br>
+        <button onclick="testRequestPermissions()">Request Permissions</button>
+      </fieldset>
+    </div>
+
+    <div style="width: 50%; float: right;">
+      <textarea id="status" rows="30" cols="50" style="width: 100%; height: 100%;"></textarea>
+      <textarea id="events" rows="30" cols="50" style="width: 100%; height: 100%;"></textarea>
+    </div>
+
+  </main>
+
+  <script src="./js/example.js" type="module"></script>
+</body>
+
 </html>

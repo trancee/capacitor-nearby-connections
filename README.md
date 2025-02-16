@@ -30,54 +30,45 @@ Before using Nearby Connections, your app must request the appropriate permissio
     <!-- https://developers.google.com/nearby/connections/android/get-started#request_permissions -->
 
     <!-- Required for Nearby Connections -->
-    <uses-permission 
-      android:name="android.permission.ACCESS_WIFI_STATE" 
-      android:maxSdkVersion="31" />
-    <uses-permission 
-      android:name="android.permission.CHANGE_WIFI_STATE" 
-      android:maxSdkVersion="31" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
-    <uses-permission 
-      android:name="android.permission.BLUETOOTH" 
-      android:maxSdkVersion="30" />
-    <uses-permission 
-      android:name="android.permission.BLUETOOTH_ADMIN" 
-      android:maxSdkVersion="30" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
 
-    <uses-permission 
-      android:name="android.permission.ACCESS_COARSE_LOCATION" 
-      android:maxSdkVersion="28" />
-    <uses-permission 
-      android:name="android.permission.ACCESS_FINE_LOCATION" 
-      android:minSdkVersion="29" 
-      android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.ACCESS_COARSE_LOCATION"
+        android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:maxSdkVersion="32" />
 
-    <uses-permission 
-      android:name="android.permission.BLUETOOTH_ADVERTISE"
-      android:minSdkVersion="31" />
-    <uses-permission 
-      android:name="android.permission.BLUETOOTH_CONNECT" 
-      android:minSdkVersion="31" />
-    <uses-permission 
-      android:name="android.permission.BLUETOOTH_SCAN" 
-      android:usesPermissionFlags="neverForLocation" 
-      android:minSdkVersion="31" 
-      tools:targetApi="s" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="s" />
 
-    <uses-permission 
-      android:name="android.permission.NEARBY_WIFI_DEVICES" 
-      android:usesPermissionFlags="neverForLocation" 
-      android:minSdkVersion="32" 
-      tools:targetApi="s" />
+    <uses-permission
+        android:name="android.permission.NEARBY_WIFI_DEVICES"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="s" />
 
     <!-- Optional: only required for FILE payloads -->
-    <uses-permission 
-      android:name="android.permission.READ_EXTERNAL_STORAGE" 
-      tools:ignore="ScopedStorage" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
 
     <uses-feature
-      android:name="android.hardware.bluetooth_le"
-      android:required="false" />
+        android:name="android.hardware.bluetooth_le"
+        android:required="false" />
 ```
 
 If the user does not grant all required permissions, the Nearby Connections API will refuse to allow your app to start advertising or discovering.
@@ -106,12 +97,15 @@ This plugin will use the following project variables (defined in your app's `var
 
 These configuration values are available:
 
-| Prop            | Type                                          | Description                                                                                                                                                                                             | Since |
-| --------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| **`name`**      | <code>string</code>                           | A human readable name for this endpoint, to appear on the remote device.                                                                                                                                | 1.0.0 |
-| **`serviceId`** | <code>string</code>                           | An identifier to advertise your app to other endpoints. The `serviceId` value must uniquely identify your app. As a best practice, use the package name of your app (for example, `com.example.myapp`). | 1.0.0 |
-| **`strategy`**  | <code><a href="#strategy">Strategy</a></code> | Sets the <a href="#strategy">`Strategy`</a> to be used when discovering or advertising to Nearby devices.                                                                                               | 1.0.0 |
-| **`lowPower`**  | <code>boolean</code>                          | Sets whether low power should be used.                                                                                                                                                                  | 1.0.0 |
+| Prop                 | Type                                                      | Description                                                                                                                                                                                             | Since |
+| -------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **`endpointName`**   | <code>string</code>                                       | A human readable name for this endpoint, to appear on the remote device.                                                                                                                                | 1.0.0 |
+| **`serviceId`**      | <code><a href="#serviceid">ServiceID</a></code>           | An identifier to advertise your app to other endpoints. The `serviceId` value must uniquely identify your app. As a best practice, use the package name of your app (for example, `com.example.myapp`). | 1.0.0 |
+| **`strategy`**       | <code><a href="#strategy">Strategy</a></code>             | Sets the <a href="#strategy">`Strategy`</a> to be used when discovering or advertising to Nearby devices.                                                                                               | 1.0.0 |
+| **`lowPower`**       | <code>boolean</code>                                      | Sets whether low power should be used.                                                                                                                                                                  | 1.0.0 |
+| **`connectionType`** | <code><a href="#connectiontype">ConnectionType</a></code> | Sets whether the client should disrupt the current connection to optimize the transfer or not.                                                                                                          | 1.0.0 |
+| **`autoConnect`**    | <code>boolean</code>                                      | Automatically accept the connection on both sides.                                                                                                                                                      | 1.0.0 |
+| **`payload`**        | <code><a href="#base64">Base64</a></code>                 | What payload to send when automatically connecting to each other.                                                                                                                                       | 1.0.0 |
 
 ### Examples
 
@@ -121,10 +115,13 @@ In `capacitor.config.json`:
 {
   "plugins": {
     "NearbyConnections": {
-      "name": "My App",
+      "endpointName": "My App",
       "serviceId": "com.example.myapp",
       "strategy": Strategy.STAR,
-      "lowPower": false
+      "lowPower": false,
+      "connectionType": : ConnectionType.BALANCED,
+      "autoConnect": false,
+      "payload": undefined
     }
   }
 }
@@ -140,10 +137,13 @@ import { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   plugins: {
     NearbyConnections: {
-      name: "My App",
+      endpointName: "My App",
       serviceId: "com.example.myapp",
       strategy: Strategy.STAR,
       lowPower: false,
+      connectionType: : ConnectionType.BALANCED,
+      autoConnect: false,
+      payload: undefined,
     },
   },
 };
@@ -159,10 +159,16 @@ export default config;
 
 * [`initialize(...)`](#initialize)
 * [`reset()`](#reset)
-* [`publish(...)`](#publish)
-* [`unpublish()`](#unpublish)
-* [`subscribe()`](#subscribe)
-* [`unsubscribe()`](#unsubscribe)
+* [`startAdvertising(...)`](#startadvertising)
+* [`stopAdvertising()`](#stopadvertising)
+* [`startDiscovery(...)`](#startdiscovery)
+* [`stopDiscovery()`](#stopdiscovery)
+* [`requestConnection(...)`](#requestconnection)
+* [`acceptConnection(...)`](#acceptconnection)
+* [`rejectConnection(...)`](#rejectconnection)
+* [`disconnectFromEndpoint(...)`](#disconnectfromendpoint)
+* [`sendPayload(...)`](#sendpayload)
+* [`cancelPayload(...)`](#cancelpayload)
 * [`status()`](#status)
 * [`checkPermissions()`](#checkpermissions)
 * [`requestPermissions(...)`](#requestpermissions)
@@ -170,6 +176,12 @@ export default config;
 * [`addListener('onBluetoothStateChanged', ...)`](#addlisteneronbluetoothstatechanged-)
 * [`addListener('onEndpointFound', ...)`](#addlisteneronendpointfound-)
 * [`addListener('onEndpointLost', ...)`](#addlisteneronendpointlost-)
+* [`addListener('onEndpointInitiated', ...)`](#addlisteneronendpointinitiated-)
+* [`addListener('onEndpointConnected', ...)`](#addlisteneronendpointconnected-)
+* [`addListener('onEndpointDisconnected', ...)`](#addlisteneronendpointdisconnected-)
+* [`addListener('onEndpointBandwidthChanged', ...)`](#addlisteneronendpointbandwidthchanged-)
+* [`addListener('onPayloadReceived', ...)`](#addlisteneronpayloadreceived-)
+* [`addListener('onPayloadTransferUpdate', ...)`](#addlisteneronpayloadtransferupdate-)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 * [Enums](#enums)
@@ -209,53 +221,57 @@ Stops and resets advertising and discovering of endpoints.
 --------------------
 
 
-### publish(...)
+### startAdvertising(...)
 
 ```typescript
-publish(options?: PublishOptions | undefined) => Promise<void>
+startAdvertising(options?: StartAdvertisingOptions | undefined) => Promise<void>
 ```
 
-Starts advertising an endpoint for a local app.
+Starts advertising the local endpoint.
 
-| Param         | Type                                                      |
-| ------------- | --------------------------------------------------------- |
-| **`options`** | <code><a href="#publishoptions">PublishOptions</a></code> |
+| Param         | Type                                                                        |
+| ------------- | --------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#startadvertisingoptions">StartAdvertisingOptions</a></code> |
 
 **Since:** 1.0.0
 
 --------------------
 
 
-### unpublish()
+### stopAdvertising()
 
 ```typescript
-unpublish() => Promise<void>
+stopAdvertising() => Promise<void>
 ```
 
-Stops advertising a local endpoint.
+Stops advertising the local endpoint.
 
 **Since:** 1.0.0
 
 --------------------
 
 
-### subscribe()
+### startDiscovery(...)
 
 ```typescript
-subscribe() => Promise<void>
+startDiscovery(options?: StartDiscoveryOptions | undefined) => Promise<void>
 ```
 
-Starts discovery for remote endpoints with the specified service ID.
+Starts discovery for remote endpoints.
+
+| Param         | Type                                                                    |
+| ------------- | ----------------------------------------------------------------------- |
+| **`options`** | <code><a href="#startdiscoveryoptions">StartDiscoveryOptions</a></code> |
 
 **Since:** 1.0.0
 
 --------------------
 
 
-### unsubscribe()
+### stopDiscovery()
 
 ```typescript
-unsubscribe() => Promise<void>
+stopDiscovery() => Promise<void>
 ```
 
 Stops discovery for remote endpoints.
@@ -265,15 +281,116 @@ Stops discovery for remote endpoints.
 --------------------
 
 
+### requestConnection(...)
+
+```typescript
+requestConnection(options: RequestConnectionOptions) => Promise<void>
+```
+
+Sends a request to connect to a remote endpoint.
+
+| Param         | Type                                                                          |
+| ------------- | ----------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#requestconnectionoptions">RequestConnectionOptions</a></code> |
+
+**Since:** 1.0.0
+
+--------------------
+
+
+### acceptConnection(...)
+
+```typescript
+acceptConnection(options: AcceptConnectionOptions) => Promise<void>
+```
+
+Accepts a connection to a remote endpoint.
+
+| Param         | Type                                                                        |
+| ------------- | --------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#acceptconnectionoptions">AcceptConnectionOptions</a></code> |
+
+**Since:** 1.0.0
+
+--------------------
+
+
+### rejectConnection(...)
+
+```typescript
+rejectConnection(options: RejectConnectionOptions) => Promise<void>
+```
+
+Rejects a connection to a remote endpoint.
+
+| Param         | Type                                                                        |
+| ------------- | --------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#rejectconnectionoptions">RejectConnectionOptions</a></code> |
+
+**Since:** 1.0.0
+
+--------------------
+
+
+### disconnectFromEndpoint(...)
+
+```typescript
+disconnectFromEndpoint(options: DisconnectFromEndpointOptions) => Promise<void>
+```
+
+Disconnects from a remote endpoint.
+`Payload`s can no longer be sent to or received from the endpoint after this method is called.
+
+| Param         | Type                                                                                    |
+| ------------- | --------------------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#disconnectfromendpointoptions">DisconnectFromEndpointOptions</a></code> |
+
+--------------------
+
+
+### sendPayload(...)
+
+```typescript
+sendPayload(options: SendPayloadOptions) => Promise<void>
+```
+
+Sends a <a href="#payload">`Payload`</a> to a remote endpoint.
+
+| Param         | Type                                                              |
+| ------------- | ----------------------------------------------------------------- |
+| **`options`** | <code><a href="#sendpayloadoptions">SendPayloadOptions</a></code> |
+
+**Since:** 1.0.0
+
+--------------------
+
+
+### cancelPayload(...)
+
+```typescript
+cancelPayload(options: CancelPayloadOptions) => Promise<void>
+```
+
+Cancels a <a href="#payload">`Payload`</a> currently in-flight to or from remote endpoint(s).
+
+| Param         | Type                                                                  |
+| ------------- | --------------------------------------------------------------------- |
+| **`options`** | <code><a href="#cancelpayloadoptions">CancelPayloadOptions</a></code> |
+
+**Since:** 1.0.0
+
+--------------------
+
+
 ### status()
 
 ```typescript
-status() => Promise<Status>
+status() => Promise<StatusResult>
 ```
 
 Returns advertising and discovering status, and discovered endpoints.
 
-**Returns:** <code>Promise&lt;<a href="#status">Status</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#statusresult">StatusResult</a>&gt;</code>
 
 **Since:** 1.0.0
 
@@ -394,34 +511,219 @@ Called when a remote endpoint is no longer discoverable.
 --------------------
 
 
+### addListener('onEndpointInitiated', ...)
+
+```typescript
+addListener(eventName: 'onEndpointInitiated', listenerFunc: EndpointInitiatedCallback) => Promise<PluginListenerHandle>
+```
+
+A basic encrypted channel has been created between you and the endpoint.
+Both sides are now asked if they wish to accept or reject the connection before any data can be sent over this channel.
+
+| Param              | Type                                                                            |
+| ------------------ | ------------------------------------------------------------------------------- |
+| **`eventName`**    | <code>'onEndpointInitiated'</code>                                              |
+| **`listenerFunc`** | <code><a href="#endpointinitiatedcallback">EndpointInitiatedCallback</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+**Since:** 1.0.0
+
+--------------------
+
+
+### addListener('onEndpointConnected', ...)
+
+```typescript
+addListener(eventName: 'onEndpointConnected', listenerFunc: EndpointConnectedCallback) => Promise<PluginListenerHandle>
+```
+
+Called after both sides have either accepted or rejected the connection.
+
+| Param              | Type                                                                            |
+| ------------------ | ------------------------------------------------------------------------------- |
+| **`eventName`**    | <code>'onEndpointConnected'</code>                                              |
+| **`listenerFunc`** | <code><a href="#endpointconnectedcallback">EndpointConnectedCallback</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+**Since:** 1.0.0
+
+--------------------
+
+
+### addListener('onEndpointDisconnected', ...)
+
+```typescript
+addListener(eventName: 'onEndpointDisconnected', listenerFunc: EndpointDisconnectedCallback) => Promise<PluginListenerHandle>
+```
+
+Called when a remote endpoint is disconnected or has become unreachable.
+
+| Param              | Type                                                                                  |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| **`eventName`**    | <code>'onEndpointDisconnected'</code>                                                 |
+| **`listenerFunc`** | <code><a href="#endpointdisconnectedcallback">EndpointDisconnectedCallback</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+**Since:** 1.0.0
+
+--------------------
+
+
+### addListener('onEndpointBandwidthChanged', ...)
+
+```typescript
+addListener(eventName: 'onEndpointBandwidthChanged', listenerFunc: EndpointBandwidthChangedCallback) => Promise<PluginListenerHandle>
+```
+
+Called when a connection is established or if the connection quality improves to a higher connection bandwidth.
+
+| Param              | Type                                                                                          |
+| ------------------ | --------------------------------------------------------------------------------------------- |
+| **`eventName`**    | <code>'onEndpointBandwidthChanged'</code>                                                     |
+| **`listenerFunc`** | <code><a href="#endpointbandwidthchangedcallback">EndpointBandwidthChangedCallback</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+**Since:** 1.0.0
+
+--------------------
+
+
+### addListener('onPayloadReceived', ...)
+
+```typescript
+addListener(eventName: 'onPayloadReceived', listenerFunc: PayloadReceivedCallback) => Promise<PluginListenerHandle>
+```
+
+Called when a <a href="#payload">`Payload`</a> is received from a remote endpoint.
+
+| Param              | Type                                                                        |
+| ------------------ | --------------------------------------------------------------------------- |
+| **`eventName`**    | <code>'onPayloadReceived'</code>                                            |
+| **`listenerFunc`** | <code><a href="#payloadreceivedcallback">PayloadReceivedCallback</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+**Since:** 1.0.0
+
+--------------------
+
+
+### addListener('onPayloadTransferUpdate', ...)
+
+```typescript
+addListener(eventName: 'onPayloadTransferUpdate', listenerFunc: PayloadTransferUpdateCallback) => Promise<PluginListenerHandle>
+```
+
+Called with progress information about an active <a href="#payload">`Payload`</a> transfer, either incoming or outgoing.
+
+| Param              | Type                                                                                    |
+| ------------------ | --------------------------------------------------------------------------------------- |
+| **`eventName`**    | <code>'onPayloadTransferUpdate'</code>                                                  |
+| **`listenerFunc`** | <code><a href="#payloadtransferupdatecallback">PayloadTransferUpdateCallback</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+**Since:** 1.0.0
+
+--------------------
+
+
 ### Interfaces
 
 
 #### InitializeOptions
 
-| Prop            | Type                                          | Description                                                                                                                                                                                             | Default            | Since |
-| --------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | ----- |
-| **`name`**      | <code>string</code>                           | A human readable name for this endpoint, to appear on the remote device.                                                                                                                                |                    | 1.0.0 |
-| **`serviceId`** | <code>string</code>                           | An identifier to advertise your app to other endpoints. The `serviceId` value must uniquely identify your app. As a best practice, use the package name of your app (for example, `com.example.myapp`). |                    | 1.0.0 |
-| **`strategy`**  | <code><a href="#strategy">Strategy</a></code> | Sets the <a href="#strategy">`Strategy`</a> to be used when discovering or advertising to Nearby devices.                                                                                               |                    | 1.0.0 |
-| **`lowPower`**  | <code>boolean</code>                          | Sets whether low power should be used.                                                                                                                                                                  | <code>false</code> | 1.0.0 |
+| Prop               | Type                                            | Description                                                                                                                                                                                             | Default            | Since |
+| ------------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | ----- |
+| **`endpointName`** | <code>string</code>                             | A human readable name for this endpoint, to appear on the remote device.                                                                                                                                |                    | 1.0.0 |
+| **`serviceId`**    | <code><a href="#serviceid">ServiceID</a></code> | An identifier to advertise your app to other endpoints. The `serviceId` value must uniquely identify your app. As a best practice, use the package name of your app (for example, `com.example.myapp`). |                    | 1.0.0 |
+| **`strategy`**     | <code><a href="#strategy">Strategy</a></code>   | Sets the <a href="#strategy">`Strategy`</a> to be used when discovering or advertising to Nearby devices.                                                                                               |                    | 1.0.0 |
+| **`lowPower`**     | <code>boolean</code>                            | Sets whether low power should be used.                                                                                                                                                                  | <code>false</code> | 1.0.0 |
+| **`autoConnect`**  | <code>boolean</code>                            | Automatically accept the connection on both sides.                                                                                                                                                      | <code>false</code> | 1.0.0 |
+| **`payload`**      | <code><a href="#base64">Base64</a></code>       | What payload to send when automatically connecting to each other.                                                                                                                                       |                    | 1.0.0 |
 
 
-#### PublishOptions
+#### StartAdvertisingOptions
 
-| Prop                 | Type                                                      | Description                                                                                         | Default                              | Since |
-| -------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------ | ----- |
-| **`connectionType`** | <code><a href="#connectiontype">ConnectionType</a></code> | Sets whether the client should disrupt the current connection to optimize the transfer or not.      | <code>ConnectionType.BALANCED</code> | 1.0.0 |
-| **`name`**           | <code>string</code>                                       | A human readable name for this endpoint, to appear on the remote device.                            |                                      | 1.0.0 |
-| **`endpointInfo`**   | <code><a href="#base64">Base64</a></code>                 | Identifing information about this endpoint (eg. name, device type), to appear on the remote device. |                                      | 1.0.0 |
+| Prop                 | Type                                                      | Description                                                                                    | Default                              | Since |
+| -------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------ | ----- |
+| **`endpointName`**   | <code>string</code>                                       | A human readable name for this endpoint, to appear on the remote device.                       |                                      | 1.0.0 |
+| **`connectionType`** | <code><a href="#connectiontype">ConnectionType</a></code> | Sets whether the client should disrupt the current connection to optimize the transfer or not. | <code>ConnectionType.BALANCED</code> | 1.0.0 |
+| **`lowPower`**       | <code>boolean</code>                                      | Sets whether low power should be used.                                                         |                                      | 1.0.0 |
 
 
-#### Status
+#### StartDiscoveryOptions
+
+| Prop           | Type                 | Description                            | Since |
+| -------------- | -------------------- | -------------------------------------- | ----- |
+| **`lowPower`** | <code>boolean</code> | Sets whether low power should be used. | 1.0.0 |
+
+
+#### RequestConnectionOptions
+
+| Prop               | Type                                              | Description                                                                        | Since |
+| ------------------ | ------------------------------------------------- | ---------------------------------------------------------------------------------- | ----- |
+| **`endpointId`**   | <code><a href="#endpointid">EndpointID</a></code> | The identifier for the remote endpoint to which a connection request will be sent. | 1.0.0 |
+| **`endpointName`** | <code>string</code>                               | A human readable name for this endpoint, to appear on the remote device.           | 1.0.0 |
+
+
+#### AcceptConnectionOptions
+
+| Prop             | Type                                              | Description                             | Since |
+| ---------------- | ------------------------------------------------- | --------------------------------------- | ----- |
+| **`endpointId`** | <code><a href="#endpointid">EndpointID</a></code> | The identifier for the remote endpoint. | 1.0.0 |
+
+
+#### RejectConnectionOptions
+
+| Prop             | Type                                              | Description                             | Since |
+| ---------------- | ------------------------------------------------- | --------------------------------------- | ----- |
+| **`endpointId`** | <code><a href="#endpointid">EndpointID</a></code> | The identifier for the remote endpoint. | 1.0.0 |
+
+
+#### DisconnectFromEndpointOptions
+
+| Prop             | Type                                              | Description                                                | Since |
+| ---------------- | ------------------------------------------------- | ---------------------------------------------------------- | ----- |
+| **`endpointId`** | <code><a href="#endpointid">EndpointID</a></code> | The identifier for the remote endpoint to disconnect from. | 1.0.0 |
+
+
+#### SendPayloadOptions
+
+| Prop             | Type                                              | Description                                                                 | Since |
+| ---------------- | ------------------------------------------------- | --------------------------------------------------------------------------- | ----- |
+| **`endpointId`** | <code><a href="#endpointid">EndpointID</a></code> | The identifier for the remote endpoint to which the payload should be sent. | 1.0.0 |
+| **`payload`**    | <code><a href="#payload">Payload</a></code>       | The <a href="#payload">`Payload`</a> to be sent.                            | 1.0.0 |
+
+
+#### Payload
+
+A <a href="#payload">Payload</a> sent between devices.
+
+| Prop              | Type                                                | Description                           | Since |
+| ----------------- | --------------------------------------------------- | ------------------------------------- | ----- |
+| **`payloadId`**   | <code><a href="#payloadid">PayloadID</a></code>     | A unique identifier for this payload. | 1.0.0 |
+| **`payloadType`** | <code><a href="#payloadtype">PayloadType</a></code> | The type of this payload.             | 1.0.0 |
+| **`payload`**     | <code><a href="#base64">Base64</a></code>           | <a href="#payload">Payload</a> data.  | 1.0.0 |
+
+
+#### CancelPayloadOptions
+
+| Prop            | Type                                            | Description                                                           | Since |
+| --------------- | ----------------------------------------------- | --------------------------------------------------------------------- | ----- |
+| **`payloadId`** | <code><a href="#payloadid">PayloadID</a></code> | The identifier for the <a href="#payload">Payload</a> to be canceled. | 1.0.0 |
+
+
+#### StatusResult
 
 | Prop                | Type                  |
 | ------------------- | --------------------- |
-| **`isPublishing`**  | <code>boolean</code>  |
-| **`isSubscribing`** | <code>boolean</code>  |
+| **`isAdvertising`** | <code>boolean</code>  |
+| **`isDiscovering`** | <code>boolean</code>  |
 | **`ids`**           | <code>string[]</code> |
 
 
@@ -453,19 +755,71 @@ Called when a remote endpoint is no longer discoverable.
 
 #### Endpoint
 
-| Prop               | Type                                      | Description                                                                                         | Since |
-| ------------------ | ----------------------------------------- | --------------------------------------------------------------------------------------------------- | ----- |
-| **`id`**           | <code>string</code>                       | The ID of the remote endpoint that was discovered.                                                  | 1.0.0 |
-| **`name`**         | <code>string</code>                       | A human readable name for this endpoint, to appear on the remote device.                            | 1.0.0 |
-| **`endpointInfo`** | <code><a href="#base64">Base64</a></code> | Identifing information about this endpoint (eg. name, device type), to appear on the remote device. | 1.0.0 |
+| Prop               | Type                                              | Description                                                              | Since |
+| ------------------ | ------------------------------------------------- | ------------------------------------------------------------------------ | ----- |
+| **`endpointId`**   | <code><a href="#endpointid">EndpointID</a></code> | The ID of the remote endpoint that was discovered.                       | 1.0.0 |
+| **`endpointName`** | <code>string</code>                               | A human readable name for this endpoint, to appear on the remote device. | 1.0.0 |
+
+
+#### ConnectionInfo
+
+Information about a connection that is being initiated.
+
+| Prop                       | Type                 | Description                                                                                                                                 | Since |
+| -------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **`authenticationToken`**  | <code>string</code>  | A 4 digit authentication token that has been given to both devices.                                                                         | 1.0.0 |
+| **`authenticationStatus`** | <code>number</code>  | An authentication status for Authentication handshaking result after uKey2 verification.                                                    | 1.0.0 |
+| **`isIncomingConnection`** | <code>boolean</code> | `True` if the connection request was initiated from a remote device. `False` if this device was the one to try and initiate the connection. | 1.0.0 |
+
+
+#### BandwidthInfo
+
+Information about a connection's bandwidth.
+
+| Prop          | Type                                        | Description                       | Since |
+| ------------- | ------------------------------------------- | --------------------------------- | ----- |
+| **`quality`** | <code><a href="#quality">Quality</a></code> | The connection's current quality. | 1.0.0 |
+
+
+#### PayloadTransferUpdate
+
+Describes the status for an active <a href="#payload">`Payload`</a> transfer, either incoming or outgoing.
+
+| Prop                   | Type                                                                                | Description                               | Since |
+| ---------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------- | ----- |
+| **`payloadId`**        | <code><a href="#payloadid">PayloadID</a></code>                                     | The payload identifier.                   | 1.0.0 |
+| **`status`**           | <code><a href="#payloadtransferupdatestatus">PayloadTransferUpdateStatus</a></code> | The status of the payload.                | 1.0.0 |
+| **`bytesTransferred`** | <code>number</code>                                                                 | The number of bytes transferred so far.   | 1.0.0 |
+| **`totalBytes`**       | <code>number</code>                                                                 | The total number of bytes in the payload. | 1.0.0 |
 
 
 ### Type Aliases
 
 
+#### ServiceID
+
+Used to represent a service identifier.
+
+<code>string</code>
+
+
 #### Base64
 
 <code>string</code>
+
+
+#### EndpointID
+
+Used to represent an enpoint.
+
+<code>string</code>
+
+
+#### PayloadID
+
+Used to represent a payload.
+
+<code>number</code>
 
 
 #### PermissionState
@@ -480,12 +834,61 @@ Called when a remote endpoint is no longer discoverable.
 
 #### EndpointFoundCallback
 
+Called when a remote endpoint is discovered.
+
 <code>(_: <a href="#endpoint">Endpoint</a>): void</code>
 
 
 #### EndpointLostCallback
 
+Called when a remote endpoint is no longer discoverable.
+
 <code>(_: <a href="#endpoint">Endpoint</a>): void</code>
+
+
+#### EndpointInitiatedCallback
+
+A basic encrypted channel has been created between you and the endpoint.
+
+<code>(_: <a href="#endpoint">Endpoint</a> & <a href="#connectioninfo">ConnectionInfo</a>): void</code>
+
+
+#### EndpointConnectedCallback
+
+A basic encrypted channel has been created between you and the endpoint.
+Both sides are now asked if they wish to accept or reject the connection before any data can be sent over this channel.
+
+<code>(_: <a href="#endpoint">Endpoint</a>): void</code>
+
+
+#### EndpointDisconnectedCallback
+
+Called when a remote endpoint is disconnected or has become unreachable.
+At this point service (re-)discovery may start again.
+
+<code>(_: <a href="#endpoint">Endpoint</a>): void</code>
+
+
+#### EndpointBandwidthChangedCallback
+
+Called when a connection is established or if the connection quality improves to a higher connection bandwidth.
+
+<code>(_: <a href="#endpoint">Endpoint</a> & <a href="#bandwidthinfo">BandwidthInfo</a>): void</code>
+
+
+#### PayloadReceivedCallback
+
+Called when a payload is received from a remote endpoint. Depending on the type of the payload,
+all of the data may or may not have been received at the time of this call.
+
+<code>(_: <a href="#endpoint">Endpoint</a> & <a href="#payload">Payload</a>): void</code>
+
+
+#### PayloadTransferUpdateCallback
+
+Called with progress information about an active payload transfer, either incoming or outgoing.
+
+<code>(_: <a href="#endpoint">Endpoint</a> & <a href="#payloadtransferupdate">PayloadTransferUpdate</a>): void</code>
 
 
 ### Enums
@@ -493,20 +896,30 @@ Called when a remote endpoint is no longer discoverable.
 
 #### Strategy
 
-| Members              | Value                         | Description                                                                            | Since |
-| -------------------- | ----------------------------- | -------------------------------------------------------------------------------------- | ----- |
-| **`CLUSTER`**        | <code>'cluster'</code>        | Peer-to-peer strategy that supports an M-to-N, or cluster-shaped, connection topology. | 1.0.0 |
-| **`STAR`**           | <code>'star'</code>           | Peer-to-peer strategy that supports a 1-to-N, or star-shaped, connection topology.     | 1.0.0 |
-| **`POINT_TO_POINT`** | <code>'point-to-point'</code> | Peer-to-peer strategy that supports a 1-to-1 connection topology.                      | 1.0.0 |
+| Members              | Value                       | Description                                                                                                                                                                                          | Since |
+| -------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **`CLUSTER`**        | <code>'cluster'</code>      | Peer-to-peer strategy that supports an M-to-N, or cluster-shaped, connection topology. No restrictions on the amount of incoming and outgoing connections.                                           | 1.0.0 |
+| **`STAR`**           | <code>'star'</code>         | Peer-to-peer strategy that supports a 1-to-N, or star-shaped, connection topology. Restricts the discoverer to a single connection, while advertisers have no restrictions on amount of connections. | 1.0.0 |
+| **`POINT_TO_POINT`** | <code>'pointToPoint'</code> | Peer-to-peer strategy that supports a 1-to-1 connection topology. Restricts both adverisers and discoverers to a single connection.                                                                  | 1.0.0 |
 
 
 #### ConnectionType
 
-| Members              | Value          | Description                                                                                  | Since |
-| -------------------- | -------------- | -------------------------------------------------------------------------------------------- | ----- |
-| **`BALANCED`**       | <code>0</code> | Nearby Connections will change the device's Wi-Fi or Bluetooth status only if necessary.     | 1.0.0 |
-| **`DISRUPTIVE`**     | <code>1</code> | Nearby Connections will change the device's Wi-Fi or Bluetooth status to enhance throughput. | 1.0.0 |
-| **`NON_DISRUPTIVE`** | <code>2</code> | Nearby Connections should not change the device's Wi-Fi or Bluetooth status.                 | 1.0.0 |
+| Members              | Value                        | Description                                                                                  | Since |
+| -------------------- | ---------------------------- | -------------------------------------------------------------------------------------------- | ----- |
+| **`BALANCED`**       | <code>'balanced'</code>      | Nearby Connections will change the device's Wi-Fi or Bluetooth status only if necessary.     | 1.0.0 |
+| **`DISRUPTIVE`**     | <code>'disruptive'</code>    | Nearby Connections will change the device's Wi-Fi or Bluetooth status to enhance throughput. | 1.0.0 |
+| **`NON_DISRUPTIVE`** | <code>'nonDisruptive'</code> | Nearby Connections should not change the device's Wi-Fi or Bluetooth status.                 | 1.0.0 |
+
+
+#### PayloadType
+
+| Members       | Value                  | Description                                                                                                                                        | Since |
+| ------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **`UNKNOWN`** | <code>'unknown'</code> |                                                                                                                                                    |       |
+| **`BYTES`**   | <code>'bytes'</code>   | A <a href="#payload">Payload</a> consisting of a single byte array.                                                                                | 1.0.0 |
+| **`FILE`**    | <code>'file'</code>    | A <a href="#payload">Payload</a> representing a file on the device.                                                                                | 1.0.0 |
+| **`STREAM`**  | <code>'stream'</code>  | A <a href="#payload">Payload</a> representing a real-time stream of data; e.g. generated data for which the total size is not known ahead of time. | 1.0.0 |
 
 
 #### BluetoothState
@@ -519,5 +932,25 @@ Called when a remote endpoint is no longer discoverable.
 | **`UNAUTHORIZED`** | <code>'unauthorized'</code> | A state that indicates the application isn’t authorized to use the Bluetooth low energy role.       | 1.0.0 |
 | **`POWERED_OFF`**  | <code>'poweredOff'</code>   | A state that indicates Bluetooth is currently powered off.                                          | 1.0.0 |
 | **`POWERED_ON`**   | <code>'poweredOn'</code>    | A state that indicates Bluetooth is currently powered on and available to use.                      | 1.0.0 |
+
+
+#### Quality
+
+| Members       | Value                  | Description                                                                                                                                                                                           | Since |
+| ------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **`UNKNOWN`** | <code>'unknown'</code> |                                                                                                                                                                                                       |       |
+| **`LOW`**     | <code>'low'</code>     | The connection quality is poor (5KBps) and is not suitable for sending files. It's recommended you wait until the connection quality improves.                                                        | 1.0.0 |
+| **`MEDIUM`**  | <code>'medium'</code>  | The connection quality is ok (60~200KBps) and is suitable for sending small files. For large files, it's recommended you wait until the connection quality improves.                                  | 1.0.0 |
+| **`HIGH`**    | <code>'high'</code>    | The connection quality is good or great (6MBps~60MBps) and files can readily be sent. The connection quality cannot improve further but may still be impacted by environment or hardware limitations. | 1.0.0 |
+
+
+#### PayloadTransferUpdateStatus
+
+| Members           | Value                     |
+| ----------------- | ------------------------- |
+| **`SUCCESS`**     | <code>'success'</code>    |
+| **`FAILURE`**     | <code>'failure'</code>    |
+| **`IN_PROGRESS`** | <code>'inProgress'</code> |
+| **`CANCELED`**    | <code>'canceled'</code>   |
 
 </docgen-api>
