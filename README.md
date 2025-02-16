@@ -105,7 +105,7 @@ These configuration values are available:
 | **`lowPower`**       | <code>boolean</code>                                      | Sets whether low power should be used.                                                                                                                                                                  | 1.0.0 |
 | **`connectionType`** | <code><a href="#connectiontype">ConnectionType</a></code> | Sets whether the client should disrupt the current connection to optimize the transfer or not.                                                                                                          | 1.0.0 |
 | **`autoConnect`**    | <code>boolean</code>                                      | Automatically accept the connection on both sides.                                                                                                                                                      | 1.0.0 |
-| **`payload`**        | <code><a href="#base64">Base64</a></code>                 | What payload to send when automatically connecting to each other.                                                                                                                                       | 1.0.0 |
+| **`payload`**        | <code>string</code>                                       | What payload to send when automatically connecting to each other.                                                                                                                                       | 1.0.0 |
 
 ### Examples
 
@@ -118,10 +118,10 @@ In `capacitor.config.json`:
       "endpointName": "My App",
       "serviceId": "com.example.myapp",
       "strategy": Strategy.STAR,
-      "lowPower": false,
-      "connectionType": : ConnectionType.BALANCED,
-      "autoConnect": false,
-      "payload": undefined
+      "lowPower": true,
+      "connectionType": ConnectionType.BALANCED,
+      "autoConnect": true,
+      "payload": "Hello, World!"
     }
   }
 }
@@ -140,10 +140,10 @@ const config: CapacitorConfig = {
       endpointName: "My App",
       serviceId: "com.example.myapp",
       strategy: Strategy.STAR,
-      lowPower: false,
-      connectionType: : ConnectionType.BALANCED,
-      autoConnect: false,
-      payload: undefined,
+      lowPower: true,
+      connectionType: ConnectionType.BALANCED,
+      autoConnect: true,
+      payload: "Hello, World!",
     },
   },
 };
@@ -643,8 +643,8 @@ Called with progress information about an active <a href="#payload">`Payload`</a
 | **`serviceId`**    | <code><a href="#serviceid">ServiceID</a></code> | An identifier to advertise your app to other endpoints. The `serviceId` value must uniquely identify your app. As a best practice, use the package name of your app (for example, `com.example.myapp`). |                    | 1.0.0 |
 | **`strategy`**     | <code><a href="#strategy">Strategy</a></code>   | Sets the <a href="#strategy">`Strategy`</a> to be used when discovering or advertising to Nearby devices.                                                                                               |                    | 1.0.0 |
 | **`lowPower`**     | <code>boolean</code>                            | Sets whether low power should be used.                                                                                                                                                                  | <code>false</code> | 1.0.0 |
-| **`autoConnect`**  | <code>boolean</code>                            | Automatically accept the connection on both sides.                                                                                                                                                      | <code>false</code> | 1.0.0 |
-| **`payload`**      | <code><a href="#base64">Base64</a></code>       | What payload to send when automatically connecting to each other.                                                                                                                                       |                    | 1.0.0 |
+| **`autoConnect`**  | <code>boolean</code>                            | Automatically accept the connection on both sides.                                                                                                                                                      |                    | 1.0.0 |
+| **`payload`**      | <code>string</code>                             | What payload to send when automatically connecting to each other.                                                                                                                                       |                    | 1.0.0 |
 
 
 #### StartAdvertisingOptions
@@ -653,14 +653,14 @@ Called with progress information about an active <a href="#payload">`Payload`</a
 | -------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------ | ----- |
 | **`endpointName`**   | <code>string</code>                                       | A human readable name for this endpoint, to appear on the remote device.                       |                                      | 1.0.0 |
 | **`connectionType`** | <code><a href="#connectiontype">ConnectionType</a></code> | Sets whether the client should disrupt the current connection to optimize the transfer or not. | <code>ConnectionType.BALANCED</code> | 1.0.0 |
-| **`lowPower`**       | <code>boolean</code>                                      | Sets whether low power should be used.                                                         |                                      | 1.0.0 |
+| **`lowPower`**       | <code>boolean</code>                                      | Sets whether low power should be used.                                                         | <code>false</code>                   | 1.0.0 |
 
 
 #### StartDiscoveryOptions
 
-| Prop           | Type                 | Description                            | Since |
-| -------------- | -------------------- | -------------------------------------- | ----- |
-| **`lowPower`** | <code>boolean</code> | Sets whether low power should be used. | 1.0.0 |
+| Prop           | Type                 | Description                            | Default            | Since |
+| -------------- | -------------------- | -------------------------------------- | ------------------ | ----- |
+| **`lowPower`** | <code>boolean</code> | Sets whether low power should be used. | <code>false</code> | 1.0.0 |
 
 
 #### RequestConnectionOptions
@@ -708,7 +708,7 @@ A <a href="#payload">Payload</a> sent between devices.
 | ----------------- | --------------------------------------------------- | ------------------------------------- | ----- |
 | **`payloadId`**   | <code><a href="#payloadid">PayloadID</a></code>     | A unique identifier for this payload. | 1.0.0 |
 | **`payloadType`** | <code><a href="#payloadtype">PayloadType</a></code> | The type of this payload.             | 1.0.0 |
-| **`payload`**     | <code><a href="#base64">Base64</a></code>           | <a href="#payload">Payload</a> data.  | 1.0.0 |
+| **`payload`**     | <code>string</code>                                 | <a href="#payload">Payload</a> data.  | 1.0.0 |
 
 
 #### CancelPayloadOptions
@@ -799,11 +799,6 @@ Describes the status for an active <a href="#payload">`Payload`</a> transfer, ei
 #### ServiceID
 
 Used to represent a service identifier.
-
-<code>string</code>
-
-
-#### Base64
 
 <code>string</code>
 

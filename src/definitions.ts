@@ -94,7 +94,7 @@ declare module '@capacitor/cli' {
        * Sets whether low power should be used.
        *
        * @since 1.0.0
-       * @example false
+       * @example true
        */
       lowPower?: boolean;
 
@@ -102,7 +102,7 @@ declare module '@capacitor/cli' {
        * Sets whether the client should disrupt the current connection to optimize the transfer or not.
        *
        * @since 1.0.0
-       * @example: ConnectionType.BALANCED
+       * @example ConnectionType.BALANCED
        */
       connectionType?: ConnectionType;
 
@@ -110,7 +110,7 @@ declare module '@capacitor/cli' {
        * Automatically accept the connection on both sides.
        *
        * @since 1.0.0
-       * @example false
+       * @example true
        */
       autoConnect?: boolean;
 
@@ -118,8 +118,9 @@ declare module '@capacitor/cli' {
        * What payload to send when automatically connecting to each other.
        *
        * @since 1.0.0
+       * @example "Hello, World!"
        */
-      payload?: Base64;
+      payload?: string;
     };
   }
 }
@@ -519,7 +520,7 @@ export interface BandwidthInfo {
    *
    * @since 1.0.0
    */
-  quality: Quality;
+  readonly quality: Quality;
 }
 
 /**
@@ -534,20 +535,20 @@ export interface ConnectionInfo {
    *
    * @since 1.0.0
    */
-  authenticationToken: string;
+  readonly authenticationToken: string;
   /**
    * An authentication status for Authentication handshaking result after uKey2 verification.
    *
    * @since 1.0.0
    */
-  authenticationStatus: number;
+  readonly authenticationStatus: number;
   /**
    * `True` if the connection request was initiated from a remote device.
    * `False` if this device was the one to try and initiate the connection.
    *
    * @since 1.0.0
    */
-  isIncomingConnection: boolean;
+  readonly isIncomingConnection: boolean;
 }
 
 export interface ConnectionResolution {
@@ -633,6 +634,7 @@ export interface Payload {
    * The type of this payload.
    *
    * @since 1.0.0
+   * @example PayloadType.BYTES
    */
   readonly payloadType: PayloadType;
 
@@ -640,8 +642,9 @@ export interface Payload {
    * Payload data.
    *
    * @since 1.0.0
+   * @example "Hello, World!"
    */
-  readonly payload: Base64;
+  readonly payload: string;
 }
 
 /**
@@ -698,28 +701,28 @@ export interface PayloadTransferUpdate {
    *
    * @since 1.0.0
    */
-  payloadId: PayloadID;
+  readonly payloadId: PayloadID;
 
   /**
    * The status of the payload.
    *
    * @since 1.0.0
    */
-  status: PayloadTransferUpdateStatus;
+  readonly status: PayloadTransferUpdateStatus;
 
   /**
    * The number of bytes transferred so far.
    *
    * @since 1.0.0
    */
-  bytesTransferred: number;
+  readonly bytesTransferred: number;
 
   /**
    * The total number of bytes in the payload.
    *
    * @since 1.0.0
    */
-  totalBytes: number;
+  readonly totalBytes: number;
 }
 
 export interface StatusResult {
@@ -807,7 +810,7 @@ export interface InitializeOptions {
    * Sets the `Strategy` to be used when discovering or advertising to Nearby devices.
    *
    * @since 1.0.0
-   * @example: Strategy.STAR
+   * @example Strategy.STAR
    */
   strategy?: Strategy;
 
@@ -816,7 +819,7 @@ export interface InitializeOptions {
    *
    * @since 1.0.0
    * @default false
-   * @example false
+   * @example true
    */
   lowPower?: boolean;
 
@@ -824,8 +827,7 @@ export interface InitializeOptions {
    * Automatically accept the connection on both sides.
    *
    * @since 1.0.0
-   * @default false
-   * @example false
+   * @example true
    */
   autoConnect?: boolean;
 
@@ -833,11 +835,10 @@ export interface InitializeOptions {
    * What payload to send when automatically connecting to each other.
    *
    * @since 1.0.0
+   * @example "Hello, World!"
    */
-  payload?: Base64;
+  payload?: string;
 }
-
-export type Base64 = string;
 
 export interface StartAdvertisingOptions {
   /**
@@ -852,7 +853,7 @@ export interface StartAdvertisingOptions {
    *
    * @since 1.0.0
    * @default ConnectionType.BALANCED
-   * @example: ConnectionType.BALANCED
+   * @example ConnectionType.NON_DISRUPTIVE
    */
   connectionType?: ConnectionType;
 
@@ -860,7 +861,8 @@ export interface StartAdvertisingOptions {
    * Sets whether low power should be used.
    *
    * @since 1.0.0
-   * @example false
+   * @default false
+   * @example true
    */
   lowPower?: boolean;
 }
@@ -870,7 +872,8 @@ export interface StartDiscoveryOptions {
    * Sets whether low power should be used.
    *
    * @since 1.0.0
-   * @example false
+   * @default false
+   * @example true
    */
   lowPower?: boolean;
 }
