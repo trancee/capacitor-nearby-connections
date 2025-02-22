@@ -32,11 +32,6 @@
         android:usesPermissionFlags="neverForLocation"
         tools:targetApi="s" />
 
-    <!-- Optional: only required for FILE payloads -->
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
-
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="false" />

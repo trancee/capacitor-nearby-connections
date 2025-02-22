@@ -153,6 +153,18 @@ NearbyConnections.addListener('onEndpointConnected', (endpoint) => {
     document.getElementById("events").value += `⚡ onEndpointConnected(${JSON.stringify(endpoint) || ""})` + "\n";
 });
 
+NearbyConnections.addListener('onEndpointRejected', (endpoint) => {
+    console.log('onEndpointRejected', endpoint);
+
+    document.getElementById("events").value += `⚡ onEndpointRejected(${JSON.stringify(endpoint) || ""})` + "\n";
+});
+
+NearbyConnections.addListener('onEndpointFailed', (endpoint) => {
+    console.log('onEndpointFailed', endpoint);
+
+    document.getElementById("events").value += `⚡ onEndpointFailed(${JSON.stringify(endpoint) || ""})` + "\n";
+});
+
 NearbyConnections.addListener('onEndpointDisconnected', (endpoint) => {
     console.log('onEndpointDisconnected', endpoint);
 
@@ -182,50 +194,4 @@ document.getElementById("status").onchange = () => {
 }
 document.getElementById("events").onchange = () => {
     document.getElementById("events").scrollTop = document.getElementById("events").scrollHeight;
-}
-
-/**
- * Blurhash Encode
- */
-
-import { encode } from "blurhash";
-
-const loadImage = async src =>
-    new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = (...args) => reject(args);
-        img.src = src;
-    });
-
-const getImageData = image => {
-    const canvas = document.createElement("canvas");
-    canvas.width = image.width;
-    canvas.height = image.height;
-    const context = canvas.getContext("2d");
-    context.drawImage(image, 0, 0);
-    return context.getImageData(0, 0, image.width, image.height);
-};
-
-const encodeBlurhash = async imageUrl => {
-    const image = await loadImage(imageUrl);
-    const imageData = getImageData(image);
-    return encode(imageData.data, imageData.width, imageData.height, 4, 4);
-};
-
-/**
- * Blurhash Decode
- */
-
-import { decode } from "blurhash";
-
-const decodeBlurhash = pixels => {
-    //const pixels = decode("LEHV6nWB2yk8pyo0adR*.7kCMdnj", 32, 32);
-
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const imageData = ctx.createImageData(width, height);
-    imageData.data.set(pixels);
-    ctx.putImageData(imageData, 0, 0);
-    document.body.append(canvas);
 }

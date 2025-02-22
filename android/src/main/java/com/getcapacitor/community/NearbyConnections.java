@@ -3,6 +3,7 @@ package com.getcapacitor.community;
 import static com.google.android.gms.nearby.Nearby.getConnectionsClient;
 
 import androidx.annotation.NonNull;
+import com.getcapacitor.community.classes.Bandwidth;
 import com.getcapacitor.community.classes.Connection;
 import com.getcapacitor.community.classes.Endpoint;
 import com.getcapacitor.community.classes.options.AcceptConnectionOptions;
@@ -13,7 +14,10 @@ import com.getcapacitor.community.classes.options.RequestConnectionOptions;
 import com.getcapacitor.community.classes.options.SendPayloadOptions;
 import com.getcapacitor.community.classes.options.StartAdvertisingOptions;
 import com.getcapacitor.community.classes.options.StartDiscoveryOptions;
+import com.getcapacitor.community.classes.results.StatusResult;
 import com.getcapacitor.community.interfaces.EmptyCallback;
+import com.getcapacitor.community.interfaces.NonEmptyCallback;
+import com.getcapacitor.community.interfaces.Result;
 import com.getcapacitor.community.interfaces.VoidCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.nearby.connection.AdvertisingOptions;
@@ -23,6 +27,7 @@ import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
 import com.google.android.gms.nearby.connection.ConnectionOptions;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
 import com.google.android.gms.nearby.connection.ConnectionsClient;
+import com.google.android.gms.nearby.connection.ConnectionsStatusCodes;
 import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo;
 import com.google.android.gms.nearby.connection.DiscoveryOptions;
 import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
@@ -30,8 +35,6 @@ import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
-import java.util.HashMap;
-import java.util.Map;
 
 public class NearbyConnections {
 
@@ -54,12 +57,6 @@ public class NearbyConnections {
     private final ConnectionsClient connectionsClient;
 
     /**
-     * True if we are asking a discovered device to connect to us. While we ask, we cannot ask another
-     * device.
-     */
-    private boolean isConnecting = false;
-
-    /**
      * True if we are discovering.
      */
     private boolean isDiscovering = false;
@@ -68,23 +65,6 @@ public class NearbyConnections {
      * True if we are advertising.
      */
     private boolean isAdvertising = false;
-
-    /**
-     * The devices we've discovered near us.
-     */
-    private final Map<String, Endpoint> endpoints = new HashMap<>();
-
-    /**
-     * The devices we have pending connections to. They will stay pending until we call {@link
-     * #acceptConnection(Endpoint)} or {@link #rejectConnection(Endpoint)}.
-     */
-    private final Map<String, Endpoint> requests = new HashMap<>();
-
-    /**
-     * The devices we are currently connected to. For advertisers, this may be large. For discoverers,
-     * there will only be one entry in this map.
-     */
-    private final Map<String, Endpoint> connections = new HashMap<>();
 
     public NearbyConnections(@NonNull NearbyConnectionsConfig config, @NonNull NearbyConnectionsPlugin plugin) {
         this.config = config;
@@ -171,16 +151,10 @@ public class NearbyConnections {
         connectionsClient
             .startAdvertising(name, serviceId, connectionLifecycleCallback, advertisingOptions.build())
             .addOnSuccessListener(unusedResult -> {
-                // Log.v(getLogTag(), "Now advertising endpoint " + name);
-                onAdvertisingStarted();
-
                 callback.success();
             })
             .addOnFailureListener(exception -> {
                 isAdvertising = false;
-
-                // Log.w(getLogTag(), "startAdvertising failed.", exception);
-                onAdvertisingFailed();
 
                 callback.error(exception);
             });
@@ -221,21 +195,13 @@ public class NearbyConnections {
         connectionsClient
             .startDiscovery(serviceId, endpointDiscoveryCallback, discoveryOptions.build())
             .addOnSuccessListener(unusedResult -> {
-                // Log.v(getLogTag(), "Now starting discovery");
-                onDiscoveryStarted();
-
                 callback.success();
             })
             .addOnFailureListener(exception -> {
                 isDiscovering = false;
 
-                // Log.w(getLogTag(), "startDiscovering failed.", exception);
-                onDiscoveryFailed();
-
                 callback.error(exception);
             });
-
-        endpoints.clear();
     }
 
     public void stopDiscovery(@NonNull EmptyCallback callback) {
@@ -352,6 +318,16 @@ public class NearbyConnections {
     }
 
     /**
+     * Status
+     */
+
+    public void status(@NonNull NonEmptyCallback<Result> callback) {
+        StatusResult result = new StatusResult(isAdvertising, isDiscovering);
+
+        callback.success(result);
+    }
+
+    /**
      * Stops advertising.
      */
     protected void stopAdvertising() {
@@ -374,11 +350,6 @@ public class NearbyConnections {
 
         isAdvertising = false;
         isDiscovering = false;
-        isConnecting = false;
-
-        endpoints.clear();
-        requests.clear();
-        connections.clear();
     }
 
     /**
@@ -391,7 +362,6 @@ public class NearbyConnections {
 
             if (serviceId != null && serviceId.equals(info.getServiceId())) {
                 Endpoint endpoint = new Endpoint(endpointId, info.getEndpointName());
-                endpoints.put(endpointId, endpoint);
 
                 if (Boolean.TRUE.equals(config.getAutoConnect())) {
                     String endpointName = config.getEndpointName();
@@ -427,7 +397,12 @@ public class NearbyConnections {
          * Called when a connection is established or if the connection quality improves to a higher connection bandwidth.
          */
         @Override
-        public void onBandwidthChanged(@NonNull String endpointId, @NonNull BandwidthInfo bandwidthInfo) {}
+        public void onBandwidthChanged(@NonNull String endpointId, @NonNull BandwidthInfo bandwidthInfo) {
+            Endpoint endpoint = new Endpoint(endpointId, null);
+            Bandwidth bandwidth = new Bandwidth(bandwidthInfo.getQuality());
+
+            plugin.onEndpointBandwidthChanged(endpoint, bandwidth);
+        }
 
         /**
          * A basic encrypted channel has been created between you and the endpoint.
@@ -438,14 +413,7 @@ public class NearbyConnections {
          */
         @Override
         public void onConnectionInitiated(@NonNull String endpointId, @NonNull ConnectionInfo connectionInfo) {
-            // Log.d(
-            //         getLogTag(),
-            //         String.format("onConnectionInitiated(endpointId=%s, endpointName=%s)", endpointId, connectionInfo.getEndpointName())
-            // );
-
             Endpoint endpoint = new Endpoint(endpointId, connectionInfo.getEndpointName());
-            requests.put(endpointId, endpoint);
-
             Connection connection = new Connection(connectionInfo.getAuthenticationDigits(), connectionInfo.isIncomingConnection());
 
             plugin.onEndpointInitiated(endpoint, connection);
@@ -463,11 +431,7 @@ public class NearbyConnections {
          */
         @Override
         public void onConnectionResult(@NonNull String endpointId, @NonNull ConnectionResolution resolution) {
-            // Log.d(getLogTag(), String.format("onConnectionResult(endpointId=%s, resolution=%s)", endpointId, resolution));
-
-            // We're no longer connecting
-            isConnecting = false;
-
+            Endpoint endpoint = new Endpoint(endpointId, null);
             Status status = resolution.getStatus();
 
             if (status.isSuccess()) {
@@ -476,14 +440,11 @@ public class NearbyConnections {
                     connectionsClient.sendPayload(endpointId, payload);
                 }
 
-                Endpoint endpoint = requests.remove(endpointId);
-                if (endpoint != null) connectedToEndpoint(endpoint);
+                acceptedEndpoint(endpoint);
+            } else if (status.getStatusCode() == ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED) {
+                rejectedEndpoint(endpoint);
             } else {
-                // Log.w(getLogTag(), String.format("Connection failed. Received status %s.", ConnectionsStatusCodes.getStatusCodeString(status.getStatusCode())));
-                // status.getStatusMessage();
-
-                Endpoint endpoint = requests.remove(endpointId);
-                if (endpoint != null) onConnectionFailed(endpoint);
+                failedEndpoint(endpoint, ConnectionsStatusCodes.getStatusCodeString(status.getStatusCode()));
             }
         }
 
@@ -494,29 +455,25 @@ public class NearbyConnections {
          */
         @Override
         public void onDisconnected(@NonNull String endpointId) {
-            // if (!connections.containsKey(endpointId)) {
-            // Log.w(getLogTag(), "Unexpected disconnection from endpoint " + endpointId);
-            // return;
-            // }
+            Endpoint endpoint = new Endpoint(endpointId, null);
 
-            Endpoint endpoint = connections.get(endpointId);
-            if (endpoint != null) disconnectedFromEndpoint(endpoint);
+            disconnectedEndpoint(endpoint);
         }
     };
 
-    private void connectedToEndpoint(@NonNull Endpoint endpoint) {
-        // Log.d(getLogTag(), String.format("connectedToEndpoint(endpoint=%s)", endpoint));
-
-        connections.put(endpoint.endpointId(), endpoint);
-
+    private void acceptedEndpoint(@NonNull Endpoint endpoint) {
         plugin.onEndpointConnected(endpoint);
     }
 
-    private void disconnectedFromEndpoint(@NonNull Endpoint endpoint) {
-        // Log.d(getLogTag(), String.format("disconnectedFromEndpoint(endpoint=%s)", endpoint));
+    private void rejectedEndpoint(@NonNull Endpoint endpoint) {
+        plugin.onEndpointRejected(endpoint);
+    }
 
-        connections.remove(endpoint.endpointId());
+    private void failedEndpoint(@NonNull Endpoint endpoint, @NonNull String status) {
+        plugin.onEndpointFailed(endpoint, status);
+    }
 
+    private void disconnectedEndpoint(@NonNull Endpoint endpoint) {
         plugin.onEndpointDisconnected(endpoint);
     }
 
@@ -526,7 +483,7 @@ public class NearbyConnections {
     private final PayloadCallback payloadCallback = new PayloadCallback() {
         @Override
         public void onPayloadReceived(@NonNull String endpointId, @NonNull Payload payload) {
-            Endpoint endpoint = connections.get(endpointId);
+            Endpoint endpoint = new Endpoint(endpointId, null);
 
             plugin.onPayloadReceived(
                 endpoint,
@@ -535,44 +492,18 @@ public class NearbyConnections {
         }
 
         @Override
-        public void onPayloadTransferUpdate(@NonNull String endpointId, @NonNull PayloadTransferUpdate update) {}
+        public void onPayloadTransferUpdate(@NonNull String endpointId, @NonNull PayloadTransferUpdate update) {
+            Endpoint endpoint = new Endpoint(endpointId, null);
+
+            plugin.onPayloadTransferUpdate(
+                endpoint,
+                new com.getcapacitor.community.classes.PayloadTransferUpdate(
+                    update.getPayloadId(),
+                    update.getStatus(),
+                    update.getBytesTransferred(),
+                    update.getTotalBytes()
+                )
+            );
+        }
     };
-
-    /**
-     * Events
-     */
-
-    /**
-     * Called when advertising successfully starts. Override this method to act on the event.
-     */
-    protected void onAdvertisingStarted() {}
-
-    /**
-     * Called when advertising fails to start. Override this method to act on the event.
-     */
-    protected void onAdvertisingFailed() {}
-
-    /**
-     * Called when discovery successfully starts. Override this method to act on the event.
-     */
-    protected void onDiscoveryStarted() {}
-
-    /**
-     * Called when discovery fails to start. Override this method to act on the event.
-     */
-    protected void onDiscoveryFailed() {}
-
-    /**
-     * Called when a pending connection with a remote endpoint is created. Use {@link ConnectionInfo}
-     * for metadata about the connection (like incoming vs outgoing, or the authentication token). If
-     * we want to continue with the connection, call {@link #acceptConnection(Endpoint)}. Otherwise,
-     * call {@link #rejectConnection(Endpoint)}.
-     */
-    protected void onConnectionInitiated(@NonNull Endpoint endpoint, @NonNull ConnectionInfo connectionInfo) {}
-
-    /**
-     * Called when a connection with this endpoint has failed. Override this method to act on the
-     * event.
-     */
-    protected void onConnectionFailed(@NonNull Endpoint endpoint) {}
 }

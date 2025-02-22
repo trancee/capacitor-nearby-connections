@@ -262,11 +262,18 @@ export interface NearbyConnectionsPlugin {
    */
   addListener(eventName: 'onEndpointInitiated', listenerFunc: EndpointInitiatedCallback): Promise<PluginListenerHandle>;
   /**
-   * Called after both sides have either accepted or rejected the connection.
+   * Called after both sides have accepted the connection.
+   * Both sides may now send Payloads to each other.
    *
    * @since 1.0.0
    */
   addListener(eventName: 'onEndpointConnected', listenerFunc: EndpointConnectedCallback): Promise<PluginListenerHandle>;
+  /**
+   * Called when either side rejected the connection.
+   * Payloads can not be exchaged.
+   */
+  addListener(eventName: 'onEndpointRejected', listenerFunc: EndpointRejectedCallback): Promise<PluginListenerHandle>;
+  addListener(eventName: 'onEndpointFailed', listenerFunc: EndpointFailedCallback): Promise<PluginListenerHandle>;
   /**
    * Called when a remote endpoint is disconnected or has become unreachable.
    *
@@ -276,6 +283,7 @@ export interface NearbyConnectionsPlugin {
     eventName: 'onEndpointDisconnected',
     listenerFunc: EndpointDisconnectedCallback,
   ): Promise<PluginListenerHandle>;
+
   /**
    * Called when a connection is established or if the connection quality improves to a higher connection bandwidth.
    *
@@ -364,38 +372,6 @@ export enum ConnectionState {
   REJECTED = 'rejected',
 }
 
-/**
- * Indicates the current status of the transfer.
- *
- * @since 1.0.0
- */
-export enum TransferUpdate {
-  /**
-   * The remote endpoint has successfully received the full transfer.
-   *
-   * @since 1.0.0
-   */
-  SUCCESS = 'success',
-  /**
-   * Either the local or remote endpoint has canceled the transfer.
-   *
-   * @since 1.0.0
-   */
-  CANCELED = 'canceled',
-  /**
-   * The remote endpoint failed to receive the transfer.
-   *
-   * @since 1.0.0
-   */
-  FAILURE = 'failure',
-  /**
-   * The the transfer is currently in progress with an associated progress value.
-   *
-   * @since 1.0.0
-   */
-  PROGRESS = 'progress',
-}
-
 export interface Endpoint {
   /**
    * The ID of the remote endpoint that was discovered.
@@ -414,6 +390,8 @@ export interface Endpoint {
 
 /**
  * Bandwidth quality.
+ *
+ * Only available on Android.
  *
  * @since 1.0.0
  * @link https://developers.google.com/android/reference/com/google/android/gms/nearby/connection/BandwidthInfo.Quality
@@ -456,6 +434,8 @@ export enum Status {
    */
   ERROR = 'ERROR',
 
+  NETWORK_NOT_CONNECTED = 'NETWORK_NOT_CONNECTED', // 8000
+
   /**
    * The app is already advertising; call `stopAdvertising()` before trying to advertise again.
    */
@@ -490,6 +470,9 @@ export enum Status {
    * The app called an API method out of order (i.e. another method is expected to be called first).
    */
   OUT_OF_ORDER_API_CALL = 'OUT_OF_ORDER_API_CALL', // 8009
+
+  UNSUPPORTED_PAYLOAD_TYPE_FOR_STRATEGY = 'UNSUPPORTED_PAYLOAD_TYPE_FOR_STRATEGY', // 8010
+
   /**
    * An attempt to interact with a remote endpoint failed because it's unknown to us -- it's either an endpoint that was never discovered, or an endpoint that never connected to us (both of which are indicative of bad input from the client app).
    */
@@ -502,6 +485,12 @@ export enum Status {
    * An attempt to read/write data for a `Payload` of type `FILE` or `STREAM` failed.
    */
   PAYLOAD_IO_ERROR = 'PAYLOAD_IO_ERROR', // 8013
+
+  PAYLOAD_UNKNOWN = 'PAYLOAD_UNKNOWN', // 8014
+
+  ALREADY_LISTENING = 'ALREADY_LISTENING', // 8015
+
+  AUTH_ERROR = 'AUTH_ERROR', // 8016
 
   /**
    * This error indicates that Nearby Connections is already in use by some app, and thus is currently unavailable to the caller.
@@ -551,15 +540,6 @@ export interface ConnectionInfo {
   readonly isIncomingConnection: boolean;
 }
 
-export interface ConnectionResolution {
-  /**
-   * The status of the response.
-   *
-   * @since 1.0.0
-   */
-  status: string;
-}
-
 // Endpoint Discovery
 
 /**
@@ -575,18 +555,20 @@ export type EndpointLostCallback = (_: Endpoint) => void;
 
 /**
  * A basic encrypted channel has been created between you and the endpoint.
+ * Both sides are now asked if they wish to accept or reject the connection before any data can be sent over this channel.
  */
 export type EndpointInitiatedCallback = (_: Endpoint & ConnectionInfo) => void;
 /**
- * Called when a connection is established or if the connection quality improves to a higher connection bandwidth.
- */
-export type EndpointBandwidthChangedCallback = (_: Endpoint & BandwidthInfo) => void;
-
-/**
- * A basic encrypted channel has been created between you and the endpoint.
- * Both sides are now asked if they wish to accept or reject the connection before any data can be sent over this channel.
+ * Called after both sides have accepted the connection.
+ * Both sides may now send Payloads to each other.
  */
 export type EndpointConnectedCallback = (_: Endpoint) => void;
+/**
+ * Called when either side rejected the connection.
+ * Payloads can not be exchaged.
+ */
+export type EndpointRejectedCallback = (_: Endpoint) => void;
+export type EndpointFailedCallback = (_: Endpoint & Status) => void;
 /**
  * Called when a remote endpoint is disconnected or has become unreachable.
  * At this point service (re-)discovery may start again.
@@ -594,15 +576,9 @@ export type EndpointConnectedCallback = (_: Endpoint) => void;
 export type EndpointDisconnectedCallback = (_: Endpoint) => void;
 
 /**
- * Called after both sides have accepted the connection.
- * Both sides may now send Payloads to each other.
+ * Called when a connection is established or if the connection quality improves to a higher connection bandwidth.
  */
-export type EndpointAcceptedCallback = (_: Endpoint) => void;
-/**
- * Called when either side rejected the connection.
- * Payloads can not be exchaged.
- */
-export type EndpointRejectedCallback = (_: Endpoint & Status) => void;
+export type EndpointBandwidthChangedCallback = (_: Endpoint & BandwidthInfo) => void;
 
 // Payload
 
@@ -683,9 +659,29 @@ export enum PayloadType {
  * @link https://developers.google.com/android/reference/com/google/android/gms/nearby/connection/PayloadTransferUpdate.Status
  */
 export enum PayloadTransferUpdateStatus {
+  /**
+   * The remote endpoint has successfully received the full transfer.
+   *
+   * @since 1.0.0
+   */
   SUCCESS = 'success',
+  /**
+   * The remote endpoint failed to receive the transfer.
+   *
+   * @since 1.0.0
+   */
   FAILURE = 'failure',
+  /**
+   * The the transfer is currently in progress with an associated progress value.
+   *
+   * @since 1.0.0
+   */
   IN_PROGRESS = 'inProgress',
+  /**
+   * Either the local or remote endpoint has canceled the transfer.
+   *
+   * @since 1.0.0
+   */
   CANCELED = 'canceled',
 }
 
@@ -728,8 +724,6 @@ export interface PayloadTransferUpdate {
 export interface StatusResult {
   isAdvertising: boolean;
   isDiscovering: boolean;
-
-  ids: string[];
 }
 
 /**
@@ -914,18 +908,19 @@ export interface RejectConnectionOptions {
 
 export interface SendPayloadOptions {
   /**
-   * The identifier for the remote endpoint to which the payload should be sent.
+   * The identifier(s) for the remote endpoint(s) to which the payload should be sent.
    *
    * @since 1.0.0
    */
-  endpointId: EndpointID;
+  endpointId: EndpointID | EndpointID[];
 
   /**
    * The `Payload` to be sent.
    *
    * @since 1.0.0
+   * @type Base64 encoded string
    */
-  payload: Payload;
+  payload: string;
 }
 
 export interface CancelPayloadOptions {

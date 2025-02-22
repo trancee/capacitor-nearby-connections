@@ -178,6 +178,8 @@ export default config;
 * [`addListener('onEndpointLost', ...)`](#addlisteneronendpointlost-)
 * [`addListener('onEndpointInitiated', ...)`](#addlisteneronendpointinitiated-)
 * [`addListener('onEndpointConnected', ...)`](#addlisteneronendpointconnected-)
+* [`addListener('onEndpointRejected', ...)`](#addlisteneronendpointrejected-)
+* [`addListener('onEndpointFailed', ...)`](#addlisteneronendpointfailed-)
 * [`addListener('onEndpointDisconnected', ...)`](#addlisteneronendpointdisconnected-)
 * [`addListener('onEndpointBandwidthChanged', ...)`](#addlisteneronendpointbandwidthchanged-)
 * [`addListener('onPayloadReceived', ...)`](#addlisteneronpayloadreceived-)
@@ -538,7 +540,8 @@ Both sides are now asked if they wish to accept or reject the connection before 
 addListener(eventName: 'onEndpointConnected', listenerFunc: EndpointConnectedCallback) => Promise<PluginListenerHandle>
 ```
 
-Called after both sides have either accepted or rejected the connection.
+Called after both sides have accepted the connection.
+Both sides may now send Payloads to each other.
 
 | Param              | Type                                                                            |
 | ------------------ | ------------------------------------------------------------------------------- |
@@ -548,6 +551,41 @@ Called after both sides have either accepted or rejected the connection.
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
 **Since:** 1.0.0
+
+--------------------
+
+
+### addListener('onEndpointRejected', ...)
+
+```typescript
+addListener(eventName: 'onEndpointRejected', listenerFunc: EndpointRejectedCallback) => Promise<PluginListenerHandle>
+```
+
+Called when either side rejected the connection.
+Payloads can not be exchaged.
+
+| Param              | Type                                                                          |
+| ------------------ | ----------------------------------------------------------------------------- |
+| **`eventName`**    | <code>'onEndpointRejected'</code>                                             |
+| **`listenerFunc`** | <code><a href="#endpointrejectedcallback">EndpointRejectedCallback</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
+### addListener('onEndpointFailed', ...)
+
+```typescript
+addListener(eventName: 'onEndpointFailed', listenerFunc: EndpointFailedCallback) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                      |
+| ------------------ | ------------------------------------------------------------------------- |
+| **`eventName`**    | <code>'onEndpointFailed'</code>                                           |
+| **`listenerFunc`** | <code><a href="#endpointfailedcallback">EndpointFailedCallback</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
 --------------------
 
@@ -694,21 +732,10 @@ Called with progress information about an active <a href="#payload">`Payload`</a
 
 #### SendPayloadOptions
 
-| Prop             | Type                                              | Description                                                                 | Since |
-| ---------------- | ------------------------------------------------- | --------------------------------------------------------------------------- | ----- |
-| **`endpointId`** | <code><a href="#endpointid">EndpointID</a></code> | The identifier for the remote endpoint to which the payload should be sent. | 1.0.0 |
-| **`payload`**    | <code><a href="#payload">Payload</a></code>       | The <a href="#payload">`Payload`</a> to be sent.                            | 1.0.0 |
-
-
-#### Payload
-
-A <a href="#payload">Payload</a> sent between devices.
-
-| Prop              | Type                                                | Description                           | Since |
-| ----------------- | --------------------------------------------------- | ------------------------------------- | ----- |
-| **`payloadId`**   | <code><a href="#payloadid">PayloadID</a></code>     | A unique identifier for this payload. | 1.0.0 |
-| **`payloadType`** | <code><a href="#payloadtype">PayloadType</a></code> | The type of this payload.             | 1.0.0 |
-| **`payload`**     | <code>string</code>                                 | <a href="#payload">Payload</a> data.  | 1.0.0 |
+| Prop             | Type                            | Description                                                                       | Since |
+| ---------------- | ------------------------------- | --------------------------------------------------------------------------------- | ----- |
+| **`endpointId`** | <code>string \| string[]</code> | The identifier(s) for the remote endpoint(s) to which the payload should be sent. | 1.0.0 |
+| **`payload`**    | <code>string</code>             | The <a href="#payload">`Payload`</a> to be sent.                                  | 1.0.0 |
 
 
 #### CancelPayloadOptions
@@ -720,11 +747,10 @@ A <a href="#payload">Payload</a> sent between devices.
 
 #### StatusResult
 
-| Prop                | Type                  |
-| ------------------- | --------------------- |
-| **`isAdvertising`** | <code>boolean</code>  |
-| **`isDiscovering`** | <code>boolean</code>  |
-| **`ids`**           | <code>string[]</code> |
+| Prop                | Type                 |
+| ------------------- | -------------------- |
+| **`isAdvertising`** | <code>boolean</code> |
+| **`isDiscovering`** | <code>boolean</code> |
 
 
 #### PermissionStatus
@@ -779,6 +805,17 @@ Information about a connection's bandwidth.
 | Prop          | Type                                        | Description                       | Since |
 | ------------- | ------------------------------------------- | --------------------------------- | ----- |
 | **`quality`** | <code><a href="#quality">Quality</a></code> | The connection's current quality. | 1.0.0 |
+
+
+#### Payload
+
+A <a href="#payload">Payload</a> sent between devices.
+
+| Prop              | Type                                                | Description                           | Since |
+| ----------------- | --------------------------------------------------- | ------------------------------------- | ----- |
+| **`payloadId`**   | <code><a href="#payloadid">PayloadID</a></code>     | A unique identifier for this payload. | 1.0.0 |
+| **`payloadType`** | <code><a href="#payloadtype">PayloadType</a></code> | The type of this payload.             | 1.0.0 |
+| **`payload`**     | <code>string</code>                                 | <a href="#payload">Payload</a> data.  | 1.0.0 |
 
 
 #### PayloadTransferUpdate
@@ -844,16 +881,30 @@ Called when a remote endpoint is no longer discoverable.
 #### EndpointInitiatedCallback
 
 A basic encrypted channel has been created between you and the endpoint.
+Both sides are now asked if they wish to accept or reject the connection before any data can be sent over this channel.
 
 <code>(_: <a href="#endpoint">Endpoint</a> & <a href="#connectioninfo">ConnectionInfo</a>): void</code>
 
 
 #### EndpointConnectedCallback
 
-A basic encrypted channel has been created between you and the endpoint.
-Both sides are now asked if they wish to accept or reject the connection before any data can be sent over this channel.
+Called after both sides have accepted the connection.
+Both sides may now send Payloads to each other.
 
 <code>(_: <a href="#endpoint">Endpoint</a>): void</code>
+
+
+#### EndpointRejectedCallback
+
+Called when either side rejected the connection.
+Payloads can not be exchaged.
+
+<code>(_: <a href="#endpoint">Endpoint</a>): void</code>
+
+
+#### EndpointFailedCallback
+
+<code>(_: <a href="#endpoint">Endpoint</a> & <a href="#status">Status</a>): void</code>
 
 
 #### EndpointDisconnectedCallback
@@ -907,16 +958,6 @@ Called with progress information about an active payload transfer, either incomi
 | **`NON_DISRUPTIVE`** | <code>'nonDisruptive'</code> | Nearby Connections should not change the device's Wi-Fi or Bluetooth status.                 | 1.0.0 |
 
 
-#### PayloadType
-
-| Members       | Value                  | Description                                                                                                                                        | Since |
-| ------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| **`UNKNOWN`** | <code>'unknown'</code> |                                                                                                                                                    |       |
-| **`BYTES`**   | <code>'bytes'</code>   | A <a href="#payload">Payload</a> consisting of a single byte array.                                                                                | 1.0.0 |
-| **`FILE`**    | <code>'file'</code>    | A <a href="#payload">Payload</a> representing a file on the device.                                                                                | 1.0.0 |
-| **`STREAM`**  | <code>'stream'</code>  | A <a href="#payload">Payload</a> representing a real-time stream of data; e.g. generated data for which the total size is not known ahead of time. | 1.0.0 |
-
-
 #### BluetoothState
 
 | Members            | Value                       | Description                                                                                         | Since |
@@ -929,6 +970,31 @@ Called with progress information about an active payload transfer, either incomi
 | **`POWERED_ON`**   | <code>'poweredOn'</code>    | A state that indicates Bluetooth is currently powered on and available to use.                      | 1.0.0 |
 
 
+#### Status
+
+| Members                                     | Value                                                | Description                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`OK`**                                    | <code>'OK'</code>                                    | The operation was successful.                                                                                                                                                                                                                                                                                  |
+| **`ERROR`**                                 | <code>'ERROR'</code>                                 | The operation failed, without any more information.                                                                                                                                                                                                                                                            |
+| **`NETWORK_NOT_CONNECTED`**                 | <code>'NETWORK_NOT_CONNECTED'</code>                 |                                                                                                                                                                                                                                                                                                                |
+| **`ALREADY_ADVERTISING`**                   | <code>'ALREADY_ADVERTISING'</code>                   | The app is already advertising; call `stopAdvertising()` before trying to advertise again.                                                                                                                                                                                                                     |
+| **`ALREADY_DISCOVERING`**                   | <code>'ALREADY_DISCOVERING'</code>                   | The app is already discovering the specified application ID; call `stopDiscovery()` before trying to advertise again.                                                                                                                                                                                          |
+| **`ALREADY_CONNECTED_TO_ENDPOINT`**         | <code>'ALREADY_CONNECTED_TO_ENDPOINT'</code>         | The app is already connected to the specified endpoint. Multiple connections to a remote endpoint cannot be maintained simultaneously.                                                                                                                                                                         |
+| **`CONNECTION_REJECTED`**                   | <code>'CONNECTION_REJECTED'</code>                   | The remote endpoint rejected the connection request.                                                                                                                                                                                                                                                           |
+| **`NOT_CONNECTED_TO_ENDPOINT`**             | <code>'NOT_CONNECTED_TO_ENDPOINT'</code>             | The remote endpoint is not connected; messages cannot be sent to it.                                                                                                                                                                                                                                           |
+| **`RADIO_ERROR`**                           | <code>'RADIO_ERROR'</code>                           | There was an error trying to use the phone's Bluetooth/WiFi/NFC capabilities.                                                                                                                                                                                                                                  |
+| **`ALREADY_HAVE_ACTIVE_STRATEGY`**          | <code>'ALREADY_HAVE_ACTIVE_STRATEGY'</code>          | The app already has active operations (advertising, discovering, or connected to other devices) with another <a href="#strategy">`Strategy`</a>. Stop these operations on the current <a href="#strategy">`Strategy`</a> before trying to advertise or discover with a new <a href="#strategy">`Strategy`</a>. |
+| **`OUT_OF_ORDER_API_CALL`**                 | <code>'OUT_OF_ORDER_API_CALL'</code>                 | The app called an API method out of order (i.e. another method is expected to be called first).                                                                                                                                                                                                                |
+| **`UNSUPPORTED_PAYLOAD_TYPE_FOR_STRATEGY`** | <code>'UNSUPPORTED_PAYLOAD_TYPE_FOR_STRATEGY'</code> |                                                                                                                                                                                                                                                                                                                |
+| **`ENDPOINT_UNKNOWN`**                      | <code>'ENDPOINT_UNKNOWN'</code>                      | An attempt to interact with a remote endpoint failed because it's unknown to us -- it's either an endpoint that was never discovered, or an endpoint that never connected to us (both of which are indicative of bad input from the client app).                                                               |
+| **`ENDPOINT_IO_ERROR`**                     | <code>'ENDPOINT_IO_ERROR'</code>                     | An attempt to read from/write to a connected remote endpoint failed.                                                                                                                                                                                                                                           |
+| **`PAYLOAD_IO_ERROR`**                      | <code>'PAYLOAD_IO_ERROR'</code>                      | An attempt to read/write data for a <a href="#payload">`Payload`</a> of type `FILE` or `STREAM` failed.                                                                                                                                                                                                        |
+| **`PAYLOAD_UNKNOWN`**                       | <code>'PAYLOAD_UNKNOWN'</code>                       |                                                                                                                                                                                                                                                                                                                |
+| **`ALREADY_LISTENING`**                     | <code>'ALREADY_LISTENING'</code>                     |                                                                                                                                                                                                                                                                                                                |
+| **`AUTH_ERROR`**                            | <code>'AUTH_ERROR'</code>                            |                                                                                                                                                                                                                                                                                                                |
+| **`ALREADY_IN_USE`**                        | <code>'ALREADY_IN_USE'</code>                        | This error indicates that Nearby Connections is already in use by some app, and thus is currently unavailable to the caller.                                                                                                                                                                                   |
+
+
 #### Quality
 
 | Members       | Value                  | Description                                                                                                                                                                                           | Since |
@@ -939,13 +1005,23 @@ Called with progress information about an active payload transfer, either incomi
 | **`HIGH`**    | <code>'high'</code>    | The connection quality is good or great (6MBps~60MBps) and files can readily be sent. The connection quality cannot improve further but may still be impacted by environment or hardware limitations. | 1.0.0 |
 
 
+#### PayloadType
+
+| Members       | Value                  | Description                                                                                                                                        | Since |
+| ------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **`UNKNOWN`** | <code>'unknown'</code> |                                                                                                                                                    |       |
+| **`BYTES`**   | <code>'bytes'</code>   | A <a href="#payload">Payload</a> consisting of a single byte array.                                                                                | 1.0.0 |
+| **`FILE`**    | <code>'file'</code>    | A <a href="#payload">Payload</a> representing a file on the device.                                                                                | 1.0.0 |
+| **`STREAM`**  | <code>'stream'</code>  | A <a href="#payload">Payload</a> representing a real-time stream of data; e.g. generated data for which the total size is not known ahead of time. | 1.0.0 |
+
+
 #### PayloadTransferUpdateStatus
 
-| Members           | Value                     |
-| ----------------- | ------------------------- |
-| **`SUCCESS`**     | <code>'success'</code>    |
-| **`FAILURE`**     | <code>'failure'</code>    |
-| **`IN_PROGRESS`** | <code>'inProgress'</code> |
-| **`CANCELED`**    | <code>'canceled'</code>   |
+| Members           | Value                     | Description                                                                  | Since |
+| ----------------- | ------------------------- | ---------------------------------------------------------------------------- | ----- |
+| **`SUCCESS`**     | <code>'success'</code>    | The remote endpoint has successfully received the full transfer.             | 1.0.0 |
+| **`FAILURE`**     | <code>'failure'</code>    | The remote endpoint failed to receive the transfer.                          | 1.0.0 |
+| **`IN_PROGRESS`** | <code>'inProgress'</code> | The the transfer is currently in progress with an associated progress value. | 1.0.0 |
+| **`CANCELED`**    | <code>'canceled'</code>   | Either the local or remote endpoint has canceled the transfer.               | 1.0.0 |
 
 </docgen-api>

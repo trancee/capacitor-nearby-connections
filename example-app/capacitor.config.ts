@@ -17,8 +17,8 @@ const config: CapacitorConfig = {
 
       // connectionType: ConnectionType.NON_DISRUPTIVE,
 
-      autoConnect: true,
-      payload: btoa(`{ name: "PHiL", age: 50, gender: "MALE", photo: "LEHV6nWB2yk8pyo0adR*.7kCMdnj" }`),
+      // autoConnect: true,
+      // payload: btoa(`{ name: "PHiL", age: 50, gender: "MALE", photo: "LEHV6nWB2yk8pyo0adR*.7kCMdnj" }`),
     },
   },
 };

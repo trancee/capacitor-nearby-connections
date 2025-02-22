@@ -17,9 +17,7 @@
     "@capacitor-trancee/nearby-connections": "file:..",
     "@capacitor/android": "latest",
     "@capacitor/core": "latest",
-    "@capacitor/ios": "latest",
-    "@protobuf-ts/plugin": "^2.9.4",
-    "blurhash": "^2.0.5"
+    "@capacitor/ios": "latest"
   },
   "devDependencies": {
     "@capacitor/cli": "latest",

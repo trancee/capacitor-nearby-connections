@@ -14,15 +14,21 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
+import com.getcapacitor.community.classes.Bandwidth;
 import com.getcapacitor.community.classes.Connection;
 import com.getcapacitor.community.classes.Endpoint;
 import com.getcapacitor.community.classes.Payload;
+import com.getcapacitor.community.classes.PayloadTransferUpdate;
+import com.getcapacitor.community.classes.events.EndpointBandwidthChangedEvent;
 import com.getcapacitor.community.classes.events.EndpointConnectedEvent;
 import com.getcapacitor.community.classes.events.EndpointDisconnectedEvent;
+import com.getcapacitor.community.classes.events.EndpointFailedEvent;
 import com.getcapacitor.community.classes.events.EndpointFoundEvent;
 import com.getcapacitor.community.classes.events.EndpointInitiatedEvent;
 import com.getcapacitor.community.classes.events.EndpointLostEvent;
+import com.getcapacitor.community.classes.events.EndpointRejectedEvent;
 import com.getcapacitor.community.classes.events.PayloadReceivedEvent;
+import com.getcapacitor.community.classes.events.PayloadTransferUpdateEvent;
 import com.getcapacitor.community.classes.options.AcceptConnectionOptions;
 import com.getcapacitor.community.classes.options.CancelPayloadOptions;
 import com.getcapacitor.community.classes.options.DisconnectFromEndpointOptions;
@@ -32,6 +38,8 @@ import com.getcapacitor.community.classes.options.SendPayloadOptions;
 import com.getcapacitor.community.classes.options.StartAdvertisingOptions;
 import com.getcapacitor.community.classes.options.StartDiscoveryOptions;
 import com.getcapacitor.community.interfaces.EmptyCallback;
+import com.getcapacitor.community.interfaces.NonEmptyCallback;
+import com.getcapacitor.community.interfaces.Result;
 import com.getcapacitor.community.interfaces.VoidCallback;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,10 +108,12 @@ public class NearbyConnectionsPlugin extends Plugin {
     static final String ENDPOINT_LOST_EVENT = "onEndpointLost";
     static final String ENDPOINT_INITIATED_EVENT = "onEndpointInitiated";
     static final String ENDPOINT_CONNECTED_EVENT = "onEndpointConnected";
+    static final String ENDPOINT_REJECTED_EVENT = "onEndpointRejected";
+    static final String ENDPOINT_FAILED_EVENT = "onEndpointFailed";
     static final String ENDPOINT_DISCONNECTED_EVENT = "onEndpointDisconnected";
+    static final String ENDPOINT_BANDWIDTH_CHANGED_EVENT = "onEndpointBandwidthChanged";
     static final String PAYLOAD_RECEIVED_EVENT = "onPayloadReceived";
-
-    static final String UNKNOWN_STRATEGY = "unknown strategy";
+    static final String PAYLOAD_TRANSFER_UPDATE_EVENT = "onPayloadTransferUpdate";
 
     static final String UNKNOWN_ERROR = "unknown error has occurred";
 
@@ -458,6 +468,27 @@ public class NearbyConnectionsPlugin extends Plugin {
         }
     }
 
+    @PluginMethod
+    public void status(PluginCall call) {
+        try {
+            NonEmptyCallback<Result> callback = new NonEmptyCallback<>() {
+                @Override
+                public void success(@NonNull Result result) {
+                    resolveCall(call, result.toJSObject());
+                }
+
+                @Override
+                public void error(Exception exception) {
+                    rejectCall(call, exception);
+                }
+            };
+
+            implementation.status(callback);
+        } catch (Exception exception) {
+            rejectCall(call, exception);
+        }
+    }
+
     /**
      * Permissions
      */
@@ -590,12 +621,30 @@ public class NearbyConnectionsPlugin extends Plugin {
     }
 
     /**
-     * Called after both sides have either accepted or rejected the connection.
+     * Called after both sides have accepted the connection.
      */
     protected void onEndpointConnected(Endpoint endpoint) {
         EndpointConnectedEvent event = new EndpointConnectedEvent(endpoint);
 
         notifyListeners(ENDPOINT_CONNECTED_EVENT, event.toJSObject());
+    }
+
+    /**
+     * Called after one side has rejected the connection.
+     */
+    protected void onEndpointRejected(Endpoint endpoint) {
+        EndpointRejectedEvent event = new EndpointRejectedEvent(endpoint);
+
+        notifyListeners(ENDPOINT_REJECTED_EVENT, event.toJSObject());
+    }
+
+    /**
+     * Called after the connection has failed.
+     */
+    protected void onEndpointFailed(Endpoint endpoint, String status) {
+        EndpointFailedEvent event = new EndpointFailedEvent(endpoint, status);
+
+        notifyListeners(ENDPOINT_FAILED_EVENT, event.toJSObject());
     }
 
     /**
@@ -608,11 +657,29 @@ public class NearbyConnectionsPlugin extends Plugin {
     }
 
     /**
+     * Called when a connection is established or if the connection quality improves to a higher connection bandwidth.
+     */
+    protected void onEndpointBandwidthChanged(Endpoint endpoint, Bandwidth bandwidth) {
+        EndpointBandwidthChangedEvent event = new EndpointBandwidthChangedEvent(endpoint, bandwidth);
+
+        notifyListeners(ENDPOINT_BANDWIDTH_CHANGED_EVENT, event.toJSObject());
+    }
+
+    /**
      * Called when a Payload is received from a remote endpoint.
      */
     protected void onPayloadReceived(Endpoint endpoint, Payload payload) {
         PayloadReceivedEvent event = new PayloadReceivedEvent(endpoint, payload);
 
         notifyListeners(PAYLOAD_RECEIVED_EVENT, event.toJSObject());
+    }
+
+    /**
+     * Called with progress information about an active Payload transfer, either incoming or outgoing.
+     */
+    protected void onPayloadTransferUpdate(Endpoint endpoint, PayloadTransferUpdate update) {
+        PayloadTransferUpdateEvent event = new PayloadTransferUpdateEvent(endpoint, update);
+
+        notifyListeners(PAYLOAD_TRANSFER_UPDATE_EVENT, event.toJSObject());
     }
 }
