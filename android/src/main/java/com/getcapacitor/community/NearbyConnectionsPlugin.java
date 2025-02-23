@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
+import com.getcapacitor.PermissionState;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
@@ -43,6 +44,7 @@ import com.getcapacitor.community.interfaces.Result;
 import com.getcapacitor.community.interfaces.VoidCallback;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.json.JSONException;
 
 @CapacitorPlugin(
@@ -421,11 +423,23 @@ public class NearbyConnectionsPlugin extends Plugin {
     @PluginMethod
     public void sendPayload(PluginCall call) {
         try {
+            List<String> endpointIds = new ArrayList<>();
+
             String endpointId = call.getString("endpointId", null);
+            if (endpointId != null) {
+                endpointIds.add(endpointId);
+            }
+
+            JSArray endpointArray = call.getArray("endpointIds", null);
+            if (endpointArray != null) {
+                for (var item : endpointArray.toList()) {
+                    endpointIds.add((String) item);
+                }
+            }
 
             String payload = call.getString("payload", null);
 
-            SendPayloadOptions options = new SendPayloadOptions(endpointId, Base64.decode(payload, Base64.NO_WRAP));
+            SendPayloadOptions options = new SendPayloadOptions(endpointIds, Base64.decode(payload, Base64.NO_WRAP));
             VoidCallback callback = new VoidCallback() {
                 @Override
                 public void success(Void unused) {
@@ -496,31 +510,53 @@ public class NearbyConnectionsPlugin extends Plugin {
     @Override
     @PluginMethod
     public void checkPermissions(PluginCall call) {
-        super.checkPermissions(call);
+        // super.checkPermissions(call);
+
+        Map<String, PermissionState> permissionsResult = getPermissionStates();
+
+        if (permissionsResult.isEmpty()) {
+            call.resolve();
+        } else {
+            List<String> aliases = getAliases();
+
+            JSObject result = new JSObject();
+
+            for (Map.Entry<String, PermissionState> entry : permissionsResult.entrySet()) {
+                if (aliases.contains(entry.getKey())) {
+                    result.put(entry.getKey(), entry.getValue());
+                }
+            }
+
+            call.resolve(result);
+        }
+    }
+
+    private List<String> getAliases() {
+        List<String> aliases = new ArrayList<>();
+
+        aliases.add("wifiState");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            aliases.add("wifiNearby");
+            aliases.add("bluetoothNearby");
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            aliases.add("bluetoothNearby");
+            aliases.add("location");
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            aliases.add("bluetoothLegacy");
+            aliases.add("location");
+        } else {
+            aliases.add("bluetoothLegacy");
+            aliases.add("locationCoarse");
+        }
+
+        return aliases;
     }
 
     @Override
     @PluginMethod
     public void requestPermissions(PluginCall call) {
-        List<String> aliases = new ArrayList<>();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            aliases.add("wifiNearby");
-            aliases.add("wifiState");
-            aliases.add("bluetoothNearby");
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            aliases.add("wifiState");
-            aliases.add("bluetoothNearby");
-            aliases.add("location");
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            aliases.add("wifiState");
-            aliases.add("bluetoothLegacy");
-            aliases.add("location");
-        } else {
-            aliases.add("wifiState");
-            aliases.add("bluetoothLegacy");
-            aliases.add("locationCoarse");
-        }
+        List<String> aliases = getAliases();
 
         JSArray permissions = call.getArray("permissions");
         if (permissions != null) {

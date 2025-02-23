@@ -35,6 +35,7 @@ import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
+import java.util.List;
 
 public class NearbyConnections {
 
@@ -286,8 +287,8 @@ public class NearbyConnections {
      */
 
     public void sendPayload(@NonNull SendPayloadOptions options, @NonNull VoidCallback callback) {
-        String endpointId = options.getEndpointId();
-        if (endpointId == null) {
+        List<String> endpointIds = options.getEndpointIds();
+        if (endpointIds == null || endpointIds.isEmpty()) {
             Exception exception = new Exception(MISSING_ENDPOINT_ID);
             callback.error(exception);
             return;
@@ -301,7 +302,7 @@ public class NearbyConnections {
         }
 
         connectionsClient
-            .sendPayload(endpointId, Payload.fromBytes(payload))
+            .sendPayload(endpointIds, Payload.fromBytes(payload))
             .addOnSuccessListener(callback::success)
             .addOnFailureListener(callback::error);
     }

@@ -908,11 +908,17 @@ export interface RejectConnectionOptions {
 
 export interface SendPayloadOptions {
   /**
-   * The identifier(s) for the remote endpoint(s) to which the payload should be sent.
+   * The identifier for the remote endpoint to which the payload should be sent.
    *
    * @since 1.0.0
    */
-  endpointId: EndpointID | EndpointID[];
+  endpointId?: EndpointID;
+  /**
+   * The identifiers for the remote endpoints to which the payload should be sent.
+   *
+   * @since 1.0.0
+   */
+  endpointIds?: EndpointID[];
 
   /**
    * The `Payload` to be sent.

@@ -9,29 +9,44 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <uses-permission
-        android:name="android.permission.BLUETOOTH" />
+        android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <!-- https://developer.android.com/develop/connectivity/bluetooth/bt-permissions#discover-local-devices -->
     <uses-permission
-        android:name="android.permission.BLUETOOTH_ADMIN" />
+        android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
 
     <uses-permission
-        android:name="android.permission.ACCESS_COARSE_LOCATION" />
+        android:name="android.permission.ACCESS_COARSE_LOCATION"
+        android:maxSdkVersion="28" />
     <uses-permission
-        android:name="android.permission.ACCESS_FINE_LOCATION" />
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:maxSdkVersion="31"
+        android:minSdkVersion="29" />
 
     <uses-permission
-        android:name="android.permission.BLUETOOTH_ADVERTISE" />
+        android:name="android.permission.BLUETOOTH_ADVERTISE"
+        android:minSdkVersion="31" />
     <uses-permission
-        android:name="android.permission.BLUETOOTH_CONNECT" />
+        android:name="android.permission.BLUETOOTH_CONNECT"
+        android:minSdkVersion="31" />
     <uses-permission
         android:name="android.permission.BLUETOOTH_SCAN"
+        android:minSdkVersion="31"
         android:usesPermissionFlags="neverForLocation"
         tools:targetApi="s" />
 
+    <!-- https://developer.android.com/develop/connectivity/wifi/wifi-permissions#nearby-devices-permission-group -->
     <uses-permission
         android:name="android.permission.NEARBY_WIFI_DEVICES"
+        android:minSdkVersion="32"
         android:usesPermissionFlags="neverForLocation"
         tools:targetApi="s" />
 
+    <!-- https://developer.android.com/develop/connectivity/bluetooth/bt-permissions#features -->
+    <uses-feature
+        android:name="android.hardware.bluetooth"
+        android:required="false" />
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="false" />

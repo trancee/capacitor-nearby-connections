@@ -732,10 +732,11 @@ Called with progress information about an active <a href="#payload">`Payload`</a
 
 #### SendPayloadOptions
 
-| Prop             | Type                            | Description                                                                       | Since |
-| ---------------- | ------------------------------- | --------------------------------------------------------------------------------- | ----- |
-| **`endpointId`** | <code>string \| string[]</code> | The identifier(s) for the remote endpoint(s) to which the payload should be sent. | 1.0.0 |
-| **`payload`**    | <code>string</code>             | The <a href="#payload">`Payload`</a> to be sent.                                  | 1.0.0 |
+| Prop              | Type                                              | Description                                                                   | Since |
+| ----------------- | ------------------------------------------------- | ----------------------------------------------------------------------------- | ----- |
+| **`endpointId`**  | <code><a href="#endpointid">EndpointID</a></code> | The identifier for the remote endpoint to which the payload should be sent.   | 1.0.0 |
+| **`endpointIds`** | <code>string[]</code>                             | The identifiers for the remote endpoints to which the payload should be sent. | 1.0.0 |
+| **`payload`**     | <code>string</code>                               | The <a href="#payload">`Payload`</a> to be sent.                              | 1.0.0 |
 
 
 #### CancelPayloadOptions
