@@ -12,7 +12,7 @@ public class InitializeOptions {
     private String endpointName;
 
     @Nullable
-    private String serviceId;
+    private String serviceID;
 
     @Nullable
     private Strategy strategy;
@@ -28,7 +28,7 @@ public class InitializeOptions {
 
     public InitializeOptions(
         @Nullable String endpointName,
-        @Nullable String serviceId,
+        @Nullable String serviceID,
         @Nullable String strategy,
         @Nullable Boolean lowPower,
         @Nullable Boolean autoConnect,
@@ -36,8 +36,7 @@ public class InitializeOptions {
     ) {
         this.setEndpointName(endpointName);
 
-        this.setServiceId(serviceId);
-
+        this.setServiceID(serviceID);
         this.setStrategy(strategy);
 
         this.setLowPower(lowPower);
@@ -46,14 +45,38 @@ public class InitializeOptions {
         this.setPayload(payload);
     }
 
+    public void setEndpointName(@Nullable String endpointName) {
+        this.endpointName = endpointName;
+    }
+
+    public void setServiceID(@Nullable String serviceID) {
+        this.serviceID = serviceID;
+    }
+
+    public void setStrategy(@Nullable String strategy) {
+        this.strategy = toStrategy(strategy);
+    }
+
+    public void setLowPower(@Nullable Boolean lowPower) {
+        this.lowPower = lowPower;
+    }
+
+    public void setAutoConnect(@Nullable Boolean autoConnect) {
+        this.autoConnect = autoConnect;
+    }
+
+    public void setPayload(@Nullable byte[] payload) {
+        this.payload = payload;
+    }
+
     @Nullable
     public String getEndpointName() {
         return endpointName;
     }
 
     @Nullable
-    public String getServiceId() {
-        return serviceId;
+    public String getServiceID() {
+        return serviceID;
     }
 
     @Nullable
@@ -74,29 +97,5 @@ public class InitializeOptions {
     @Nullable
     public byte[] getPayload() {
         return payload;
-    }
-
-    public void setEndpointName(@Nullable String endpointName) {
-        this.endpointName = endpointName;
-    }
-
-    public void setServiceId(@Nullable String serviceId) {
-        this.serviceId = serviceId;
-    }
-
-    public void setStrategy(@Nullable String strategy) {
-        this.strategy = toStrategy(strategy);
-    }
-
-    public void setLowPower(@Nullable Boolean lowPower) {
-        this.lowPower = lowPower;
-    }
-
-    public void setAutoConnect(@Nullable Boolean autoConnect) {
-        this.autoConnect = autoConnect;
-    }
-
-    public void setPayload(@Nullable byte[] payload) {
-        this.payload = payload;
     }
 }

@@ -27,7 +27,8 @@
   "keywords": [
     "capacitor",
     "plugin",
-    "native"
+    "native",
+    "nearby"
   ],
   "scripts": {
     "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
@@ -67,7 +68,6 @@
     "@capacitor/core": ">=7.0.0"
   },
   "prettier": "@ionic/prettier-config",
-  "swiftlint": "@ionic/swiftlint-config",
   "eslintConfig": {
     "extends": "@ionic/eslint-config/recommended"
   },

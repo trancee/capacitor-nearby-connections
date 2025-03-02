@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.gms.nearby.connection.Payload.Type;
 
-public record Payload(@NonNull Long payloadId, int payloadType, @Nullable byte[] data) {
+public record Payload(@NonNull Long payloadID, int payloadType, @Nullable byte[] data) {
     public String getPayloadType() {
         return switch (payloadType) {
             case Type.BYTES -> "bytes";

@@ -17,7 +17,9 @@ public class EndpointFailedEvent extends EndpointEvent {
     @NonNull
     public JSObject toJSObject() {
         JSObject result = super.toJSObject();
+
         result.put("status", status);
+
         return result;
     }
 }

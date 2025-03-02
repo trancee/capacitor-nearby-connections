@@ -2,13 +2,11 @@ package com.getcapacitor.community.classes.options;
 
 import static com.getcapacitor.community.NearbyConnectionsHelper.toConnectionType;
 
-import android.util.Base64;
 import androidx.annotation.Nullable;
+import com.getcapacitor.PluginCall;
+import com.getcapacitor.community.NearbyConnectionsConfig;
 
-public class RequestConnectionOptions {
-
-    @Nullable
-    private String endpointId;
+public class RequestConnectionOptions extends EndpointOptions {
 
     @Nullable
     private String endpointName;
@@ -19,22 +17,28 @@ public class RequestConnectionOptions {
     @Nullable
     private Boolean lowPower;
 
-    public RequestConnectionOptions(
-        @Nullable String endpointId,
-        @Nullable String endpointName,
-        @Nullable String connectionType,
-        @Nullable Boolean lowPower
-    ) {
-        this.setEndpointId(endpointId);
+    public RequestConnectionOptions(PluginCall call, NearbyConnectionsConfig config) {
+        super(call);
+        String endpointName = call.getString("endpointName", config.getEndpointName());
         this.setEndpointName(endpointName);
 
+        String connectionType = call.getString("connectionType", null);
         this.setConnectionType(connectionType);
+
+        Boolean lowPower = call.getBoolean("lowPower", null);
         this.setLowPower(lowPower);
     }
 
-    @Nullable
-    public String getEndpointId() {
-        return endpointId;
+    public void setEndpointName(@Nullable String endpointName) {
+        this.endpointName = endpointName;
+    }
+
+    public void setConnectionType(@Nullable String connectionType) {
+        this.connectionType = toConnectionType(connectionType);
+    }
+
+    public void setLowPower(@Nullable Boolean lowPower) {
+        this.lowPower = lowPower;
     }
 
     @Nullable
@@ -50,21 +54,5 @@ public class RequestConnectionOptions {
     @Nullable
     public Boolean getLowPower() {
         return lowPower;
-    }
-
-    public void setEndpointId(@Nullable String endpointId) {
-        this.endpointId = endpointId;
-    }
-
-    public void setEndpointName(@Nullable String endpointName) {
-        this.endpointName = endpointName;
-    }
-
-    public void setConnectionType(@Nullable String connectionType) {
-        this.connectionType = toConnectionType(connectionType);
-    }
-
-    public void setLowPower(@Nullable Boolean lowPower) {
-        this.lowPower = lowPower;
     }
 }

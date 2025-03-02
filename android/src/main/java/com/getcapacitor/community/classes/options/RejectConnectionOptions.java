@@ -1,22 +1,10 @@
 package com.getcapacitor.community.classes.options;
 
-import androidx.annotation.Nullable;
+import com.getcapacitor.PluginCall;
 
-public class RejectConnectionOptions {
+public class RejectConnectionOptions extends EndpointOptions {
 
-    @Nullable
-    private String endpointId;
-
-    public RejectConnectionOptions(@Nullable String endpointId) {
-        this.setEndpointId(endpointId);
-    }
-
-    @Nullable
-    public String getEndpointId() {
-        return endpointId;
-    }
-
-    public void setEndpointId(@Nullable String endpointId) {
-        this.endpointId = endpointId;
+    public RejectConnectionOptions(PluginCall call) {
+        super(call);
     }
 }

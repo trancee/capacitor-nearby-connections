@@ -18,10 +18,14 @@ public class PayloadTransferUpdateEvent extends EndpointEvent {
     @NonNull
     public JSObject toJSObject() {
         JSObject result = super.toJSObject();
-        result.put("payloadId", update.payloadId());
+
+        result.put("payloadID", update.payloadID());
+
         result.put("status", update.getStatus());
+
         result.put("bytesTransferred", update.bytesTransferred());
         result.put("totalBytes", update.totalBytes());
+
         return result;
     }
 }

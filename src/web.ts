@@ -9,11 +9,13 @@ import type {
   AcceptConnectionOptions,
   RejectConnectionOptions,
   SendPayloadOptions,
+  SendPayloadResult,
   CancelPayloadOptions,
-  DisconnectFromEndpointOptions,
+  DisconnectOptions,
   StartAdvertisingOptions,
   StartDiscoveryOptions,
 } from './definitions';
+import { PayloadType, PayloadTransferUpdateStatus } from './definitions';
 
 export class NearbyConnectionsWeb extends WebPlugin implements NearbyConnectionsPlugin {
   async initialize(options?: InitializeOptions): Promise<void> {
@@ -55,14 +57,20 @@ export class NearbyConnectionsWeb extends WebPlugin implements NearbyConnections
     console.info('rejectConnection', options);
     // throw this.unimplemented('Method not implemented.');
   }
-  async disconnectFromEndpoint(options: DisconnectFromEndpointOptions): Promise<void> {
-    console.info('disconnectFromEndpoint', options);
+  async disconnect(options: DisconnectOptions): Promise<void> {
+    console.info('disconnect', options);
     // throw this.unimplemented('Method not implemented.');
   }
 
-  async sendPayload(options: SendPayloadOptions): Promise<void> {
+  async sendPayload(options: SendPayloadOptions): Promise<SendPayloadResult> {
     console.info('sendPayload', options);
     // throw this.unimplemented('Method not implemented.');
+    return {
+      payloadID: -1,
+      payloadType: PayloadType.BYTES,
+
+      status: PayloadTransferUpdateStatus.SUCCESS,
+    };
   }
   async cancelPayload(options: CancelPayloadOptions): Promise<void> {
     console.info('cancelPayload', options);
@@ -71,7 +79,11 @@ export class NearbyConnectionsWeb extends WebPlugin implements NearbyConnections
 
   async status(): Promise<StatusResult> {
     console.info('status');
-    throw this.unimplemented('Method not implemented.');
+    // throw this.unimplemented('Method not implemented.');
+    return {
+      isAdvertising: false,
+      isDiscovering: false,
+    };
   }
 
   async checkPermissions(): Promise<PermissionStatus> {

@@ -1,22 +1,10 @@
 package com.getcapacitor.community.classes.options;
 
-import androidx.annotation.Nullable;
+import com.getcapacitor.PluginCall;
 
-public class CancelPayloadOptions {
+public class CancelPayloadOptions extends PayloadOptions {
 
-    @Nullable
-    private Long payloadId;
-
-    public CancelPayloadOptions(@Nullable Long payloadId) {
-        this.setPayloadId(payloadId);
-    }
-
-    @Nullable
-    public Long getPayloadId() {
-        return payloadId;
-    }
-
-    public void setPayloadId(@Nullable Long payloadId) {
-        this.payloadId = payloadId;
+    public CancelPayloadOptions(PluginCall call) {
+        super(call);
     }
 }

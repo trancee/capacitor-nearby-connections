@@ -18,9 +18,12 @@ public class PayloadReceivedEvent extends EndpointEvent {
     @NonNull
     public JSObject toJSObject() {
         JSObject result = super.toJSObject();
-        result.put("payloadId", payload.payloadId());
+
+        result.put("payloadID", payload.payloadID());
+
         result.put("payloadType", payload.getPayloadType());
         result.put("payload", payload.getPayload());
+
         return result;
     }
 }

@@ -8,17 +8,14 @@ import com.getcapacitor.community.classes.Connection;
 import com.getcapacitor.community.classes.Endpoint;
 import com.getcapacitor.community.classes.options.AcceptConnectionOptions;
 import com.getcapacitor.community.classes.options.CancelPayloadOptions;
-import com.getcapacitor.community.classes.options.DisconnectFromEndpointOptions;
+import com.getcapacitor.community.classes.options.DisconnectOptions;
 import com.getcapacitor.community.classes.options.RejectConnectionOptions;
 import com.getcapacitor.community.classes.options.RequestConnectionOptions;
 import com.getcapacitor.community.classes.options.SendPayloadOptions;
 import com.getcapacitor.community.classes.options.StartAdvertisingOptions;
 import com.getcapacitor.community.classes.options.StartDiscoveryOptions;
 import com.getcapacitor.community.classes.results.StatusResult;
-import com.getcapacitor.community.interfaces.EmptyCallback;
-import com.getcapacitor.community.interfaces.NonEmptyCallback;
-import com.getcapacitor.community.interfaces.Result;
-import com.getcapacitor.community.interfaces.VoidCallback;
+import com.getcapacitor.community.interfaces.Callback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.BandwidthInfo;
@@ -74,14 +71,17 @@ public class NearbyConnections {
         connectionsClient = getConnectionsClient(plugin.getActivity());
     }
 
-    public void initialize(@NonNull EmptyCallback callback) {
+    /**
+     * Initialize
+     */
+    public void initialize(@NonNull Callback callback) {
         if (config.getEndpointName() == null) {
             Exception exception = new Exception(MISSING_ENDPOINT_NAME);
             callback.error(exception);
             return;
         }
 
-        if (config.getServiceId() == null) {
+        if (config.getServiceID() == null) {
             Exception exception = new Exception(MISSING_SERVICE_ID);
             callback.error(exception);
             return;
@@ -102,7 +102,10 @@ public class NearbyConnections {
         callback.success();
     }
 
-    public void reset(@NonNull EmptyCallback callback) {
+    /**
+     * Reset
+     */
+    public void reset(@NonNull Callback callback) {
         stop();
 
         callback.success();
@@ -111,8 +114,7 @@ public class NearbyConnections {
     /**
      * Advertising
      */
-
-    public void startAdvertising(@NonNull StartAdvertisingOptions options, @NonNull EmptyCallback callback) {
+    public void startAdvertising(@NonNull StartAdvertisingOptions options, @NonNull Callback callback) {
         Integer connectionType = options.getConnectionType();
         if (connectionType == null) {
             connectionType = config.getConnectionType();
@@ -128,8 +130,8 @@ public class NearbyConnections {
             }
         }
 
-        String serviceId = config.getServiceId();
-        if (serviceId == null) {
+        String serviceID = config.getServiceID();
+        if (serviceID == null) {
             Exception exception = new Exception(MISSING_SERVICE_ID);
             callback.error(exception);
             return;
@@ -150,8 +152,10 @@ public class NearbyConnections {
         advertisingOptions.setStrategy(strategy);
 
         connectionsClient
-            .startAdvertising(name, serviceId, connectionLifecycleCallback, advertisingOptions.build())
+            .startAdvertising(name, serviceID, connectionLifecycleCallback, advertisingOptions.build())
             .addOnSuccessListener(unusedResult -> {
+                isAdvertising = true;
+
                 callback.success();
             })
             .addOnFailureListener(exception -> {
@@ -161,7 +165,7 @@ public class NearbyConnections {
             });
     }
 
-    public void stopAdvertising(@NonNull EmptyCallback callback) {
+    public void stopAdvertising(@NonNull Callback callback) {
         stopAdvertising();
 
         callback.success();
@@ -170,13 +174,12 @@ public class NearbyConnections {
     /**
      * Discovery
      */
-
-    public void startDiscovery(@NonNull StartDiscoveryOptions options, @NonNull EmptyCallback callback) {
+    public void startDiscovery(@NonNull StartDiscoveryOptions options, @NonNull Callback callback) {
         Boolean lowPower = options.getLowPower();
         if (lowPower != null) config.setLowPower(lowPower);
 
-        String serviceId = config.getServiceId();
-        if (serviceId == null) {
+        String serviceID = config.getServiceID();
+        if (serviceID == null) {
             Exception exception = new Exception(MISSING_SERVICE_ID);
             callback.error(exception);
             return;
@@ -194,8 +197,10 @@ public class NearbyConnections {
         discoveryOptions.setStrategy(strategy);
 
         connectionsClient
-            .startDiscovery(serviceId, endpointDiscoveryCallback, discoveryOptions.build())
+            .startDiscovery(serviceID, endpointDiscoveryCallback, discoveryOptions.build())
             .addOnSuccessListener(unusedResult -> {
+                isDiscovering = true;
+
                 callback.success();
             })
             .addOnFailureListener(exception -> {
@@ -205,8 +210,8 @@ public class NearbyConnections {
             });
     }
 
-    public void stopDiscovery(@NonNull EmptyCallback callback) {
-        stopDiscovering();
+    public void stopDiscovery(@NonNull Callback callback) {
+        stopDiscovery();
 
         callback.success();
     }
@@ -214,10 +219,9 @@ public class NearbyConnections {
     /**
      * Connection
      */
-
-    public void requestConnection(@NonNull RequestConnectionOptions options, @NonNull VoidCallback callback) {
-        String endpointId = options.getEndpointId();
-        if (endpointId == null) {
+    public void requestConnection(@NonNull RequestConnectionOptions options, @NonNull Callback callback) {
+        String endpointID = options.getEndpointID();
+        if (endpointID == null) {
             Exception exception = new Exception(MISSING_ENDPOINT_ID);
             callback.error(exception);
             return;
@@ -241,54 +245,53 @@ public class NearbyConnections {
         if (lowPower != null) connectionOptions.setLowPower(lowPower);
 
         connectionsClient
-            .requestConnection(name, endpointId, connectionLifecycleCallback, connectionOptions.build())
+            .requestConnection(name, endpointID, connectionLifecycleCallback, connectionOptions.build())
             .addOnSuccessListener(callback::success)
             .addOnFailureListener(callback::error);
     }
 
-    public void acceptConnection(@NonNull AcceptConnectionOptions options, @NonNull VoidCallback callback) {
-        String endpointId = options.getEndpointId();
-        if (endpointId == null) {
+    public void acceptConnection(@NonNull AcceptConnectionOptions options, @NonNull Callback callback) {
+        String endpointID = options.getEndpointID();
+        if (endpointID == null) {
             Exception exception = new Exception(MISSING_ENDPOINT_ID);
             callback.error(exception);
             return;
         }
 
         connectionsClient
-            .acceptConnection(endpointId, payloadCallback)
+            .acceptConnection(endpointID, payloadCallback)
             .addOnSuccessListener(callback::success)
             .addOnFailureListener(callback::error);
     }
 
-    public void rejectConnection(@NonNull RejectConnectionOptions options, @NonNull VoidCallback callback) {
-        String endpointId = options.getEndpointId();
-        if (endpointId == null) {
+    public void rejectConnection(@NonNull RejectConnectionOptions options, @NonNull Callback callback) {
+        String endpointID = options.getEndpointID();
+        if (endpointID == null) {
             Exception exception = new Exception(MISSING_ENDPOINT_ID);
             callback.error(exception);
             return;
         }
 
-        connectionsClient.rejectConnection(endpointId).addOnSuccessListener(callback::success).addOnFailureListener(callback::error);
+        connectionsClient.rejectConnection(endpointID).addOnSuccessListener(callback::success).addOnFailureListener(callback::error);
     }
 
-    public void disconnectFromEndpoint(@NonNull DisconnectFromEndpointOptions options, @NonNull VoidCallback callback) {
-        String endpointId = options.getEndpointId();
-        if (endpointId == null) {
+    public void disconnect(@NonNull DisconnectOptions options, @NonNull Callback callback) {
+        String endpointID = options.getEndpointID();
+        if (endpointID == null) {
             Exception exception = new Exception(MISSING_ENDPOINT_ID);
             callback.error(exception);
             return;
         }
 
-        connectionsClient.disconnectFromEndpoint(endpointId);
+        connectionsClient.disconnectFromEndpoint(endpointID);
     }
 
     /**
      * Payload
      */
-
-    public void sendPayload(@NonNull SendPayloadOptions options, @NonNull VoidCallback callback) {
-        List<String> endpointIds = options.getEndpointIds();
-        if (endpointIds == null || endpointIds.isEmpty()) {
+    public void sendPayload(@NonNull SendPayloadOptions options, @NonNull Callback callback) {
+        List<String> endpointIDs = options.getEndpointIDs();
+        if (endpointIDs == null || endpointIDs.isEmpty()) {
             Exception exception = new Exception(MISSING_ENDPOINT_ID);
             callback.error(exception);
             return;
@@ -302,27 +305,26 @@ public class NearbyConnections {
         }
 
         connectionsClient
-            .sendPayload(endpointIds, Payload.fromBytes(payload))
+            .sendPayload(endpointIDs, Payload.fromBytes(payload))
             .addOnSuccessListener(callback::success)
             .addOnFailureListener(callback::error);
     }
 
-    public void cancelPayload(@NonNull CancelPayloadOptions options, @NonNull VoidCallback callback) {
-        Long payloadId = options.getPayloadId();
-        if (payloadId == null) {
+    public void cancelPayload(@NonNull CancelPayloadOptions options, @NonNull Callback callback) {
+        Long payloadID = options.getPayloadID();
+        if (payloadID == null) {
             Exception exception = new Exception(MISSING_PAYLOAD_ID);
             callback.error(exception);
             return;
         }
 
-        connectionsClient.cancelPayload(payloadId).addOnSuccessListener(callback::success).addOnFailureListener(callback::error);
+        connectionsClient.cancelPayload(payloadID).addOnSuccessListener(callback::success).addOnFailureListener(callback::error);
     }
 
     /**
      * Status
      */
-
-    public void status(@NonNull NonEmptyCallback<Result> callback) {
+    public void status(@NonNull Callback callback) {
         StatusResult result = new StatusResult(isAdvertising, isDiscovering);
 
         callback.success(result);
@@ -340,7 +342,7 @@ public class NearbyConnections {
     /**
      * Stops discovery.
      */
-    protected void stopDiscovering() {
+    protected void stopDiscovery() {
         isDiscovering = false;
 
         connectionsClient.stopDiscovery();
@@ -358,17 +360,17 @@ public class NearbyConnections {
      */
     private final EndpointDiscoveryCallback endpointDiscoveryCallback = new EndpointDiscoveryCallback() {
         @Override
-        public void onEndpointFound(@NonNull String endpointId, @NonNull DiscoveredEndpointInfo info) {
-            String serviceId = config.getServiceId();
+        public void onEndpointFound(@NonNull String endpointID, @NonNull DiscoveredEndpointInfo info) {
+            String serviceID = config.getServiceID();
 
-            if (serviceId != null && serviceId.equals(info.getServiceId())) {
-                Endpoint endpoint = new Endpoint(endpointId, info.getEndpointName());
+            if (serviceID != null && serviceID.equals(info.getServiceId())) {
+                Endpoint endpoint = new Endpoint(endpointID, info.getEndpointName());
 
                 if (Boolean.TRUE.equals(config.getAutoConnect())) {
                     String endpointName = config.getEndpointName();
                     if (!(endpointName == null || endpointName.isEmpty() || endpointName.isBlank())) {
                         connectionsClient
-                            .requestConnection(endpointName, endpointId, connectionLifecycleCallback)
+                            .requestConnection(endpointName, endpointID, connectionLifecycleCallback)
                             .addOnSuccessListener((Void unused) -> {
                                 System.out.println("requestConnection::success");
                             })
@@ -383,8 +385,8 @@ public class NearbyConnections {
         }
 
         @Override
-        public void onEndpointLost(@NonNull String endpointId) {
-            Endpoint endpoint = new Endpoint(endpointId, null);
+        public void onEndpointLost(@NonNull String endpointID) {
+            Endpoint endpoint = new Endpoint(endpointID, null);
 
             plugin.onEndpointLost(endpoint);
         }
@@ -398,8 +400,8 @@ public class NearbyConnections {
          * Called when a connection is established or if the connection quality improves to a higher connection bandwidth.
          */
         @Override
-        public void onBandwidthChanged(@NonNull String endpointId, @NonNull BandwidthInfo bandwidthInfo) {
-            Endpoint endpoint = new Endpoint(endpointId, null);
+        public void onBandwidthChanged(@NonNull String endpointID, @NonNull BandwidthInfo bandwidthInfo) {
+            Endpoint endpoint = new Endpoint(endpointID, null);
             Bandwidth bandwidth = new Bandwidth(bandwidthInfo.getQuality());
 
             plugin.onEndpointBandwidthChanged(endpoint, bandwidth);
@@ -409,36 +411,36 @@ public class NearbyConnections {
          * A basic encrypted channel has been created between you and the endpoint.
          * Both sides are now asked if they wish to accept or reject the connection before any data can be sent over this channel.
          *
-         * @param endpointId The identifier for the remote endpoint.
+         * @param endpointID The identifier for the remote endpoint.
          * @param connectionInfo Other relevant information about the connection.
          */
         @Override
-        public void onConnectionInitiated(@NonNull String endpointId, @NonNull ConnectionInfo connectionInfo) {
-            Endpoint endpoint = new Endpoint(endpointId, connectionInfo.getEndpointName());
+        public void onConnectionInitiated(@NonNull String endpointID, @NonNull ConnectionInfo connectionInfo) {
+            Endpoint endpoint = new Endpoint(endpointID, connectionInfo.getEndpointName());
             Connection connection = new Connection(connectionInfo.getAuthenticationDigits(), connectionInfo.isIncomingConnection());
 
             plugin.onEndpointInitiated(endpoint, connection);
 
             if (Boolean.TRUE.equals(config.getAutoConnect())) {
-                connectionsClient.acceptConnection(endpointId, payloadCallback);
+                connectionsClient.acceptConnection(endpointID, payloadCallback);
             }
         }
 
         /**
          * Called after both sides have either accepted or rejected the connection.
          *
-         * @param endpointId The identifier for the remote endpoint.
+         * @param endpointID The identifier for the remote endpoint.
          * @param resolution The final result after tallying both devices' accept/reject responses.
          */
         @Override
-        public void onConnectionResult(@NonNull String endpointId, @NonNull ConnectionResolution resolution) {
-            Endpoint endpoint = new Endpoint(endpointId, null);
+        public void onConnectionResult(@NonNull String endpointID, @NonNull ConnectionResolution resolution) {
+            Endpoint endpoint = new Endpoint(endpointID, null);
             Status status = resolution.getStatus();
 
             if (status.isSuccess()) {
                 var payload = config.getPayload();
                 if (payload != null) {
-                    connectionsClient.sendPayload(endpointId, payload);
+                    connectionsClient.sendPayload(endpointID, payload);
                 }
 
                 acceptedEndpoint(endpoint);
@@ -452,11 +454,11 @@ public class NearbyConnections {
         /**
          * Called when a remote endpoint is disconnected or has become unreachable.
          *
-         * @param endpointId The identifier for the remote endpoint that disconnected.
+         * @param endpointID The identifier for the remote endpoint that disconnected.
          */
         @Override
-        public void onDisconnected(@NonNull String endpointId) {
-            Endpoint endpoint = new Endpoint(endpointId, null);
+        public void onDisconnected(@NonNull String endpointID) {
+            Endpoint endpoint = new Endpoint(endpointID, null);
 
             disconnectedEndpoint(endpoint);
         }
@@ -483,8 +485,8 @@ public class NearbyConnections {
      */
     private final PayloadCallback payloadCallback = new PayloadCallback() {
         @Override
-        public void onPayloadReceived(@NonNull String endpointId, @NonNull Payload payload) {
-            Endpoint endpoint = new Endpoint(endpointId, null);
+        public void onPayloadReceived(@NonNull String endpointID, @NonNull Payload payload) {
+            Endpoint endpoint = new Endpoint(endpointID, null);
 
             plugin.onPayloadReceived(
                 endpoint,
@@ -493,8 +495,8 @@ public class NearbyConnections {
         }
 
         @Override
-        public void onPayloadTransferUpdate(@NonNull String endpointId, @NonNull PayloadTransferUpdate update) {
-            Endpoint endpoint = new Endpoint(endpointId, null);
+        public void onPayloadTransferUpdate(@NonNull String endpointID, @NonNull PayloadTransferUpdate update) {
+            Endpoint endpoint = new Endpoint(endpointID, null);
 
             plugin.onPayloadTransferUpdate(
                 endpoint,

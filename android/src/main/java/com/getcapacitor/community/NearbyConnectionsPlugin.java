@@ -2,10 +2,6 @@ package com.getcapacitor.community;
 
 import android.Manifest;
 import android.os.Build;
-import android.util.Base64;
-import android.util.Log;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PermissionState;
@@ -32,16 +28,13 @@ import com.getcapacitor.community.classes.events.PayloadReceivedEvent;
 import com.getcapacitor.community.classes.events.PayloadTransferUpdateEvent;
 import com.getcapacitor.community.classes.options.AcceptConnectionOptions;
 import com.getcapacitor.community.classes.options.CancelPayloadOptions;
-import com.getcapacitor.community.classes.options.DisconnectFromEndpointOptions;
+import com.getcapacitor.community.classes.options.DisconnectOptions;
 import com.getcapacitor.community.classes.options.RejectConnectionOptions;
 import com.getcapacitor.community.classes.options.RequestConnectionOptions;
 import com.getcapacitor.community.classes.options.SendPayloadOptions;
 import com.getcapacitor.community.classes.options.StartAdvertisingOptions;
 import com.getcapacitor.community.classes.options.StartDiscoveryOptions;
-import com.getcapacitor.community.interfaces.EmptyCallback;
-import com.getcapacitor.community.interfaces.NonEmptyCallback;
-import com.getcapacitor.community.interfaces.Result;
-import com.getcapacitor.community.interfaces.VoidCallback;
+import com.getcapacitor.community.interfaces.Callback;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -117,8 +110,6 @@ public class NearbyConnectionsPlugin extends Plugin {
     static final String PAYLOAD_RECEIVED_EVENT = "onPayloadReceived";
     static final String PAYLOAD_TRANSFER_UPDATE_EVENT = "onPayloadTransferUpdate";
 
-    static final String UNKNOWN_ERROR = "unknown error has occurred";
-
     private NearbyConnections implementation;
 
     private NearbyConnectionsConfig config;
@@ -137,52 +128,42 @@ public class NearbyConnectionsPlugin extends Plugin {
 
     @PluginMethod
     public void initialize(PluginCall call) {
-        String endpointName = call.getString("endpointName", null);
-        if (endpointName != null) {
-            config.setEndpointName(endpointName);
-        }
-
-        String serviceId = call.getString("serviceId", null);
-        if (serviceId != null) {
-            config.setServiceId(serviceId);
-        }
-
-        String strategy = call.getString("strategy", null);
-        if (strategy != null) {
-            config.setStrategy(strategy);
-        }
-
-        Boolean lowPower = call.getBoolean("lowPower", null);
-        if (lowPower != null) {
-            config.setLowPower(lowPower);
-        }
-
-        Boolean autoConnect = call.getBoolean("autoConnect", null);
-        if (autoConnect != null) {
-            config.setAutoConnect(autoConnect);
-        }
-
-        String payload = call.getString("payload", null);
-        if (payload != null) {
-            config.setPayload(payload);
-        }
+        Callback callback = new Callback(call) {};
 
         try {
-            EmptyCallback callback = new EmptyCallback() {
-                @Override
-                public void success() {
-                    resolveCall(call);
-                }
+            String endpointName = call.getString("endpointName", null);
+            if (endpointName != null) {
+                config.setEndpointName(endpointName);
+            }
 
-                @Override
-                public void error(Exception exception) {
-                    rejectCall(call, exception);
-                }
-            };
+            String serviceID = call.getString("serviceID", null);
+            if (serviceID != null) {
+                config.setServiceID(serviceID);
+            }
+
+            String strategy = call.getString("strategy", null);
+            if (strategy != null) {
+                config.setStrategy(strategy);
+            }
+
+            Boolean lowPower = call.getBoolean("lowPower", null);
+            if (lowPower != null) {
+                config.setLowPower(lowPower);
+            }
+
+            Boolean autoConnect = call.getBoolean("autoConnect", null);
+            if (autoConnect != null) {
+                config.setAutoConnect(autoConnect);
+            }
+
+            String payload = call.getString("payload", null);
+            if (payload != null) {
+                config.setPayload(payload);
+            }
 
             implementation.initialize(callback);
         } catch (Exception exception) {
-            rejectCall(call, exception);
+            callback.error(exception);
         }
     }
 
@@ -192,22 +173,12 @@ public class NearbyConnectionsPlugin extends Plugin {
 
     @PluginMethod
     public void reset(PluginCall call) {
+        Callback callback = new Callback(call) {};
+
         try {
-            EmptyCallback callback = new EmptyCallback() {
-                @Override
-                public void success() {
-                    resolveCall(call);
-                }
-
-                @Override
-                public void error(Exception exception) {
-                    rejectCall(call, exception);
-                }
-            };
-
             implementation.reset(callback);
         } catch (Exception exception) {
-            rejectCall(call, exception);
+            callback.error(exception);
         }
     }
 
@@ -217,48 +188,25 @@ public class NearbyConnectionsPlugin extends Plugin {
 
     @PluginMethod
     public void startAdvertising(PluginCall call) {
+        Callback callback = new Callback(call) {};
+
         try {
-            String connectionType = call.getString("connectionType", null);
-
-            String endpointName = call.getString("endpointName", config.getEndpointName());
-
-            StartAdvertisingOptions options = new StartAdvertisingOptions(connectionType, endpointName);
-            EmptyCallback callback = new EmptyCallback() {
-                @Override
-                public void success() {
-                    resolveCall(call);
-                }
-
-                @Override
-                public void error(Exception exception) {
-                    rejectCall(call, exception);
-                }
-            };
+            StartAdvertisingOptions options = new StartAdvertisingOptions(call, config);
 
             implementation.startAdvertising(options, callback);
         } catch (Exception exception) {
-            rejectCall(call, exception);
+            callback.error(exception);
         }
     }
 
     @PluginMethod
     public void stopAdvertising(PluginCall call) {
+        Callback callback = new Callback(call) {};
+
         try {
-            EmptyCallback callback = new EmptyCallback() {
-                @Override
-                public void success() {
-                    resolveCall(call);
-                }
-
-                @Override
-                public void error(Exception exception) {
-                    rejectCall(call, exception);
-                }
-            };
-
             implementation.stopAdvertising(callback);
         } catch (Exception exception) {
-            rejectCall(call, exception);
+            callback.error(exception);
         }
     }
 
@@ -268,46 +216,25 @@ public class NearbyConnectionsPlugin extends Plugin {
 
     @PluginMethod
     public void startDiscovery(PluginCall call) {
+        Callback callback = new Callback(call) {};
+
         try {
-            Boolean lowPower = call.getBoolean("lowPower", null);
-
-            StartDiscoveryOptions options = new StartDiscoveryOptions(lowPower);
-            EmptyCallback callback = new EmptyCallback() {
-                @Override
-                public void success() {
-                    resolveCall(call);
-                }
-
-                @Override
-                public void error(Exception exception) {
-                    rejectCall(call, exception);
-                }
-            };
+            StartDiscoveryOptions options = new StartDiscoveryOptions(call);
 
             implementation.startDiscovery(options, callback);
         } catch (Exception exception) {
-            rejectCall(call, exception);
+            callback.error(exception);
         }
     }
 
     @PluginMethod
     public void stopDiscovery(PluginCall call) {
+        Callback callback = new Callback(call) {};
+
         try {
-            EmptyCallback callback = new EmptyCallback() {
-                @Override
-                public void success() {
-                    resolveCall(call);
-                }
-
-                @Override
-                public void error(Exception exception) {
-                    rejectCall(call, exception);
-                }
-            };
-
             implementation.stopDiscovery(callback);
         } catch (Exception exception) {
-            rejectCall(call, exception);
+            callback.error(exception);
         }
     }
 
@@ -317,102 +244,53 @@ public class NearbyConnectionsPlugin extends Plugin {
 
     @PluginMethod
     public void requestConnection(PluginCall call) {
+        Callback callback = new Callback(call) {};
+
         try {
-            String endpointId = call.getString("endpointId", null);
-            String endpointName = call.getString("endpointName", config.getEndpointName());
-
-            String connectionType = call.getString("connectionType", null);
-
-            Boolean lowPower = call.getBoolean("lowPower", null);
-
-            RequestConnectionOptions options = new RequestConnectionOptions(endpointId, endpointName, connectionType, lowPower);
-            VoidCallback callback = new VoidCallback() {
-                @Override
-                public void success(Void unused) {
-                    resolveCall(call);
-                }
-
-                @Override
-                public void error(Exception exception) {
-                    rejectCall(call, exception);
-                }
-            };
+            RequestConnectionOptions options = new RequestConnectionOptions(call, config);
 
             implementation.requestConnection(options, callback);
         } catch (Exception exception) {
-            rejectCall(call, exception);
+            callback.error(exception);
         }
     }
 
     @PluginMethod
     public void acceptConnection(PluginCall call) {
+        Callback callback = new Callback(call) {};
+
         try {
-            String endpointId = call.getString("endpointId", null);
-
-            AcceptConnectionOptions options = new AcceptConnectionOptions(endpointId);
-            VoidCallback callback = new VoidCallback() {
-                @Override
-                public void success(Void unused) {
-                    resolveCall(call);
-                }
-
-                @Override
-                public void error(Exception exception) {
-                    rejectCall(call, exception);
-                }
-            };
+            AcceptConnectionOptions options = new AcceptConnectionOptions(call);
 
             implementation.acceptConnection(options, callback);
         } catch (Exception exception) {
-            rejectCall(call, exception);
+            callback.error(exception);
         }
     }
 
     @PluginMethod
     public void rejectConnection(PluginCall call) {
+        Callback callback = new Callback(call) {};
+
         try {
-            String endpointId = call.getString("endpointId", null);
-
-            RejectConnectionOptions options = new RejectConnectionOptions(endpointId);
-            VoidCallback callback = new VoidCallback() {
-                @Override
-                public void success(Void unused) {
-                    resolveCall(call);
-                }
-
-                @Override
-                public void error(Exception exception) {
-                    rejectCall(call, exception);
-                }
-            };
+            RejectConnectionOptions options = new RejectConnectionOptions(call);
 
             implementation.rejectConnection(options, callback);
         } catch (Exception exception) {
-            rejectCall(call, exception);
+            callback.error(exception);
         }
     }
 
     @PluginMethod
-    public void disconnectFromEndpoint(PluginCall call) {
+    public void disconnect(PluginCall call) {
+        Callback callback = new Callback(call) {};
+
         try {
-            String endpointId = call.getString("endpointId", null);
+            DisconnectOptions options = new DisconnectOptions(call);
 
-            DisconnectFromEndpointOptions options = new DisconnectFromEndpointOptions(endpointId);
-            VoidCallback callback = new VoidCallback() {
-                @Override
-                public void success(Void unused) {
-                    resolveCall(call);
-                }
-
-                @Override
-                public void error(Exception exception) {
-                    rejectCall(call, exception);
-                }
-            };
-
-            implementation.disconnectFromEndpoint(options, callback);
+            implementation.disconnect(options, callback);
         } catch (Exception exception) {
-            rejectCall(call, exception);
+            callback.error(exception);
         }
     }
 
@@ -422,84 +300,42 @@ public class NearbyConnectionsPlugin extends Plugin {
 
     @PluginMethod
     public void sendPayload(PluginCall call) {
+        Callback callback = new Callback(call) {};
+
         try {
-            List<String> endpointIds = new ArrayList<>();
-
-            String endpointId = call.getString("endpointId", null);
-            if (endpointId != null) {
-                endpointIds.add(endpointId);
-            }
-
-            JSArray endpointArray = call.getArray("endpointIds", null);
-            if (endpointArray != null) {
-                for (var item : endpointArray.toList()) {
-                    endpointIds.add((String) item);
-                }
-            }
-
-            String payload = call.getString("payload", null);
-
-            SendPayloadOptions options = new SendPayloadOptions(endpointIds, Base64.decode(payload, Base64.NO_WRAP));
-            VoidCallback callback = new VoidCallback() {
-                @Override
-                public void success(Void unused) {
-                    resolveCall(call);
-                }
-
-                @Override
-                public void error(Exception exception) {
-                    rejectCall(call, exception);
-                }
-            };
+            SendPayloadOptions options = new SendPayloadOptions(call);
 
             implementation.sendPayload(options, callback);
         } catch (Exception exception) {
-            rejectCall(call, exception);
+            callback.error(exception);
         }
     }
 
     @PluginMethod
     public void cancelPayload(PluginCall call) {
+        Callback callback = new Callback(call) {};
+
         try {
-            Long payloadId = call.getLong("payloadId", null);
-
-            CancelPayloadOptions options = new CancelPayloadOptions(payloadId);
-            VoidCallback callback = new VoidCallback() {
-                @Override
-                public void success(Void unused) {
-                    resolveCall(call);
-                }
-
-                @Override
-                public void error(Exception exception) {
-                    rejectCall(call, exception);
-                }
-            };
+            CancelPayloadOptions options = new CancelPayloadOptions(call);
 
             implementation.cancelPayload(options, callback);
         } catch (Exception exception) {
-            rejectCall(call, exception);
+            callback.error(exception);
         }
     }
 
+    /**
+     * Status
+     */
+
     @PluginMethod
     public void status(PluginCall call) {
+        Callback callback = new Callback(call) {};
+
         try {
-            NonEmptyCallback<Result> callback = new NonEmptyCallback<>() {
-                @Override
-                public void success(@NonNull Result result) {
-                    resolveCall(call, result.toJSObject());
-                }
-
-                @Override
-                public void error(Exception exception) {
-                    rejectCall(call, exception);
-                }
-            };
-
             implementation.status(callback);
         } catch (Exception exception) {
-            rejectCall(call, exception);
+            callback.error(exception);
         }
     }
 
@@ -583,8 +419,8 @@ public class NearbyConnectionsPlugin extends Plugin {
         String endpointName = getConfig().getString("endpointName", null);
         config.setEndpointName(endpointName);
 
-        String serviceId = getConfig().getString("serviceId", null);
-        config.setServiceId(serviceId);
+        String serviceID = getConfig().getString("serviceID", null);
+        config.setServiceID(serviceID);
 
         String strategy = getConfig().getString("strategy", null);
         config.setStrategy(strategy);
@@ -602,31 +438,6 @@ public class NearbyConnectionsPlugin extends Plugin {
         config.setPayload(payload);
 
         return config;
-    }
-
-    /**
-     * Calls
-     */
-
-    private void resolveCall(@NonNull PluginCall call, @Nullable JSObject result) {
-        if (result == null) {
-            resolveCall(call);
-        } else {
-            call.resolve(result);
-        }
-    }
-
-    private void resolveCall(@NonNull PluginCall call) {
-        call.resolve();
-    }
-
-    private void rejectCall(@NonNull PluginCall call, @NonNull Exception exception) {
-        String message = exception.getMessage();
-        if (message == null) {
-            message = UNKNOWN_ERROR;
-        }
-        Log.e(getLogTag(), message, exception);
-        call.reject(message, exception);
     }
 
     /**

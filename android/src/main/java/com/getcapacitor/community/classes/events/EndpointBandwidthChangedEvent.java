@@ -18,7 +18,9 @@ public class EndpointBandwidthChangedEvent extends EndpointEvent {
     @NonNull
     public JSObject toJSObject() {
         JSObject result = super.toJSObject();
+
         result.put("quality", bandwidth.getQuality());
+
         return result;
     }
 }

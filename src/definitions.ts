@@ -74,13 +74,13 @@ declare module '@capacitor/cli' {
       /**
        * An identifier to advertise your app to other endpoints.
        *
-       * The `serviceId` value must uniquely identify your app.
+       * The `serviceID` value must uniquely identify your app.
        * As a best practice, use the package name of your app (for example, `com.example.myapp`).
        *
        * @since 1.0.0
        * @example "com.example.myapp"
        */
-      serviceId?: ServiceID;
+      serviceID?: ServiceID;
 
       /**
        * Sets the `Strategy` to be used when discovering or advertising to Nearby devices.
@@ -187,14 +187,14 @@ export interface NearbyConnectionsPlugin {
    * Disconnects from a remote endpoint.
    * `Payload`s can no longer be sent to or received from the endpoint after this method is called.
    */
-  disconnectFromEndpoint(options: DisconnectFromEndpointOptions): Promise<void>;
+  disconnect(options: DisconnectOptions): Promise<void>;
 
   /**
    * Sends a `Payload` to a remote endpoint.
    *
    * @since 1.0.0
    */
-  sendPayload(options: SendPayloadOptions): Promise<void>;
+  sendPayload(options: SendPayloadOptions): Promise<SendPayloadResult>;
   /**
    * Cancels a `Payload` currently in-flight to or from remote endpoint(s).
    *
@@ -327,7 +327,7 @@ export const MAX_BYTES_DATA_SIZE = 1047552;
 export type ServiceID = string;
 
 /**
- * Used to represent an enpoint.
+ * Used to represent an endpoint.
  *
  * @since 1.0.0
  */
@@ -378,7 +378,7 @@ export interface Endpoint {
    *
    * @since 1.0.0
    */
-  endpointId: EndpointID;
+  endpointID: EndpointID;
 
   /**
    * A human readable name for this endpoint, to appear on the remote device.
@@ -604,7 +604,7 @@ export interface Payload {
    *
    * @since 1.0.0
    */
-  readonly payloadId: PayloadID;
+  readonly payloadID: PayloadID;
 
   /**
    * The type of this payload.
@@ -630,8 +630,6 @@ export interface Payload {
  * @link https://developers.google.com/android/reference/com/google/android/gms/nearby/connection/Payload.Type
  */
 export enum PayloadType {
-  UNKNOWN = 'unknown',
-
   /**
    * A Payload consisting of a single byte array.
    *
@@ -666,6 +664,12 @@ export enum PayloadTransferUpdateStatus {
    */
   SUCCESS = 'success',
   /**
+   * Either the local or remote endpoint has canceled the transfer.
+   *
+   * @since 1.0.0
+   */
+  CANCELED = 'canceled',
+  /**
    * The remote endpoint failed to receive the transfer.
    *
    * @since 1.0.0
@@ -677,12 +681,6 @@ export enum PayloadTransferUpdateStatus {
    * @since 1.0.0
    */
   IN_PROGRESS = 'inProgress',
-  /**
-   * Either the local or remote endpoint has canceled the transfer.
-   *
-   * @since 1.0.0
-   */
-  CANCELED = 'canceled',
 }
 
 /**
@@ -697,7 +695,7 @@ export interface PayloadTransferUpdate {
    *
    * @since 1.0.0
    */
-  readonly payloadId: PayloadID;
+  readonly payloadID: PayloadID;
 
   /**
    * The status of the payload.
@@ -719,11 +717,6 @@ export interface PayloadTransferUpdate {
    * @since 1.0.0
    */
   readonly totalBytes: number;
-}
-
-export interface StatusResult {
-  isAdvertising: boolean;
-  isDiscovering: boolean;
 }
 
 /**
@@ -792,13 +785,13 @@ export interface InitializeOptions {
   /**
    * An identifier to advertise your app to other endpoints.
    *
-   * The `serviceId` value must uniquely identify your app.
+   * The `serviceID` value must uniquely identify your app.
    * As a best practice, use the package name of your app (for example, `com.example.myapp`).
    *
    * @since 1.0.0
    * @example "com.example.myapp"
    */
-  serviceId?: ServiceID;
+  serviceID?: ServiceID;
 
   /**
    * Sets the `Strategy` to be used when discovering or advertising to Nearby devices.
@@ -878,7 +871,7 @@ export interface RequestConnectionOptions {
    *
    * @since 1.0.0
    */
-  endpointId: EndpointID;
+  endpointID: EndpointID;
 
   /**
    * A human readable name for this endpoint, to appear on the remote device.
@@ -894,7 +887,7 @@ export interface AcceptConnectionOptions {
    *
    * @since 1.0.0
    */
-  endpointId: EndpointID;
+  endpointID: EndpointID;
 }
 
 export interface RejectConnectionOptions {
@@ -903,7 +896,7 @@ export interface RejectConnectionOptions {
    *
    * @since 1.0.0
    */
-  endpointId: EndpointID;
+  endpointID: EndpointID;
 }
 
 export interface SendPayloadOptions {
@@ -912,13 +905,13 @@ export interface SendPayloadOptions {
    *
    * @since 1.0.0
    */
-  endpointId?: EndpointID;
+  endpointID?: EndpointID;
   /**
    * The identifiers for the remote endpoints to which the payload should be sent.
    *
    * @since 1.0.0
    */
-  endpointIds?: EndpointID[];
+  endpointIDs?: EndpointID[];
 
   /**
    * The `Payload` to be sent.
@@ -929,22 +922,51 @@ export interface SendPayloadOptions {
   payload: string;
 }
 
+export interface SendPayloadResult {
+  /**
+   * A unique identifier for this payload.
+   *
+   * @since 1.0.0
+   */
+  readonly payloadID: PayloadID;
+
+  /**
+   * The type of this payload.
+   *
+   * @since 1.0.0
+   * @example PayloadType.BYTES
+   */
+  readonly payloadType: PayloadType;
+
+  /**
+   * The status of the payload.
+   *
+   * @since 1.0.0
+   */
+  readonly status: PayloadTransferUpdateStatus;
+}
+
 export interface CancelPayloadOptions {
   /**
    * The identifier for the Payload to be canceled.
    *
    * @since 1.0.0
    */
-  payloadId: PayloadID;
+  payloadID: PayloadID;
 }
 
-export interface DisconnectFromEndpointOptions {
+export interface DisconnectOptions {
   /**
    * The identifier for the remote endpoint to disconnect from.
    *
    * @since 1.0.0
    */
-  endpointId: EndpointID;
+  endpointID: EndpointID;
+}
+
+export interface StatusResult {
+  isAdvertising: boolean;
+  isDiscovering: boolean;
 }
 
 /**

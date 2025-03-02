@@ -10,14 +10,16 @@ let package = Package(
             targets: ["NearbyConnectionsPlugin"])
     ],
     dependencies: [
-        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "7.0.0")
+        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "7.0.0"),
+        .package(path: "nearby")
     ],
     targets: [
         .target(
             name: "NearbyConnectionsPlugin",
             dependencies: [
                 .product(name: "Capacitor", package: "capacitor-swift-pm"),
-                .product(name: "Cordova", package: "capacitor-swift-pm")
+                .product(name: "Cordova", package: "capacitor-swift-pm"),
+                .product(name: "NearbyConnections", package: "nearby")
             ],
             path: "ios/Sources/NearbyConnectionsPlugin"),
         .testTarget(

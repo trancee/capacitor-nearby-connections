@@ -16,8 +16,13 @@ public class EndpointEvent {
     @NonNull
     public JSObject toJSObject() {
         JSObject result = new JSObject();
-        result.put("endpointId", endpoint.endpointId());
-        if (endpoint.endpointName() != null) result.put("endpointName", endpoint.endpointName());
+
+        result.put("endpointID", endpoint.endpointID());
+
+        if (endpoint.endpointName() != null) {
+            result.put("endpointName", endpoint.endpointName());
+        }
+
         return result;
     }
 }

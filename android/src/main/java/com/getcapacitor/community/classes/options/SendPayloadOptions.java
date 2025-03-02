@@ -1,49 +1,61 @@
 package com.getcapacitor.community.classes.options;
 
+import android.util.Base64;
 import androidx.annotation.Nullable;
+import com.getcapacitor.JSArray;
+import com.getcapacitor.PluginCall;
+import java.util.ArrayList;
 import java.util.List;
+import org.json.JSONException;
 
 public class SendPayloadOptions {
 
-    // @Nullable
-    // private String endpointId;
     @Nullable
-    private List<String> endpointIds;
+    private List<String> endpointIDs;
 
     @Nullable
     private byte[] payload;
 
-    public SendPayloadOptions(@Nullable List<String> endpointIds, @Nullable byte[] payload) {
-        // this.setEndpointId(endpointId);
-        this.setEndpointIds(endpointIds);
+    public SendPayloadOptions(PluginCall call) throws JSONException {
+        List<String> endpointIDs = new ArrayList<>();
 
+        String endpointID = call.getString("endpointID", null);
+        if (endpointID != null) {
+            endpointIDs.add(endpointID);
+        }
+
+        JSArray endpointArray = call.getArray("endpointIDs", null);
+        if (endpointArray != null) {
+            for (var item : endpointArray.toList()) {
+                endpointIDs.add((String) item);
+            }
+        }
+
+        this.setEndpointIDs(endpointIDs);
+
+        String payload = call.getString("payload", null);
         this.setPayload(payload);
     }
 
-    // @Nullable
-    // public String getEndpointId() {
-    //     return endpointId;
-    // }
+    public void setEndpointIDs(@Nullable List<String> endpointIDs) {
+        this.endpointIDs = endpointIDs;
+    }
+
+    public void setPayload(@Nullable byte[] payload) {
+        this.payload = payload;
+    }
+
+    public void setPayload(@Nullable String payload) {
+        this.payload = Base64.decode(payload, Base64.NO_WRAP);
+    }
 
     @Nullable
-    public List<String> getEndpointIds() {
-        return endpointIds;
+    public List<String> getEndpointIDs() {
+        return endpointIDs;
     }
 
     @Nullable
     public byte[] getPayload() {
         return payload;
-    }
-
-    // public void setEndpointId(@Nullable String endpointId) {
-    //     this.endpointId = endpointId;
-    // }
-
-    public void setEndpointIds(@Nullable List<String> endpointIds) {
-        this.endpointIds = endpointIds;
-    }
-
-    public void setPayload(@Nullable byte[] payload) {
-        this.payload = payload;
     }
 }

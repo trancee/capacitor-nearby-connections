@@ -2,26 +2,32 @@ package com.getcapacitor.community.classes.options;
 
 import static com.getcapacitor.community.NearbyConnectionsHelper.toConnectionType;
 
-import android.util.Base64;
 import androidx.annotation.Nullable;
+import com.getcapacitor.PluginCall;
+import com.getcapacitor.community.NearbyConnectionsConfig;
 
 public class StartAdvertisingOptions {
 
     @Nullable
-    private Integer connectionType;
-
-    @Nullable
     private String endpointName;
 
-    public StartAdvertisingOptions(@Nullable String connectionType, @Nullable String endpointName) {
-        this.setConnectionType(connectionType);
+    @Nullable
+    private Integer connectionType;
 
+    public StartAdvertisingOptions(PluginCall call, NearbyConnectionsConfig config) {
+        String endpointName = call.getString("endpointName", config.getEndpointName());
         this.setEndpointName(endpointName);
+
+        String connectionType = call.getString("connectionType");
+        this.setConnectionType(connectionType);
     }
 
-    @Nullable
-    public Integer getConnectionType() {
-        return connectionType;
+    public void setEndpointName(@Nullable String endpointName) {
+        this.endpointName = endpointName;
+    }
+
+    public void setConnectionType(@Nullable String connectionType) {
+        this.connectionType = toConnectionType(connectionType);
     }
 
     @Nullable
@@ -29,11 +35,8 @@ public class StartAdvertisingOptions {
         return endpointName;
     }
 
-    public void setConnectionType(@Nullable String connectionType) {
-        this.connectionType = toConnectionType(connectionType);
-    }
-
-    public void setEndpointName(@Nullable String endpointName) {
-        this.endpointName = endpointName;
+    @Nullable
+    public Integer getConnectionType() {
+        return connectionType;
     }
 }

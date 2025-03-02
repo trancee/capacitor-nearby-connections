@@ -6,7 +6,14 @@ This guide provides instructions for contributing to this Capacitor plugin.
 
 ### Local Setup
 
-1. Fork and clone the repo.
+1. Fork and clone the repo with the recursive option.
+1. Download the submodule contents.
+
+    ```shell
+    cd nearby
+    git submodule update --init --recursive
+    ```
+
 1. Install the dependencies.
 
     ```shell
