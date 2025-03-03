@@ -2,23 +2,11 @@ package com.getcapacitor.community.classes.options;
 
 import androidx.annotation.Nullable;
 import com.getcapacitor.PluginCall;
+import com.getcapacitor.community.NearbyConnectionsConfig;
 
-public class StartDiscoveryOptions {
+public class StartDiscoveryOptions extends ConnectionOptions {
 
-    @Nullable
-    private Boolean lowPower;
-
-    public StartDiscoveryOptions(PluginCall call) {
-        Boolean lowPower = call.getBoolean("lowPower", null);
-        this.setLowPower(lowPower);
-    }
-
-    public void setLowPower(@Nullable Boolean lowPower) {
-        this.lowPower = lowPower;
-    }
-
-    @Nullable
-    public Boolean getLowPower() {
-        return lowPower;
+    public StartDiscoveryOptions(PluginCall call, NearbyConnectionsConfig config) {
+        super(call, config);
     }
 }

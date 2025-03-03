@@ -3,13 +3,13 @@ package com.getcapacitor.community.classes.options;
 import androidx.annotation.Nullable;
 import com.getcapacitor.PluginCall;
 
-public class PayloadOptions {
+public abstract class PayloadOptions {
 
     @Nullable
     private Long payloadID;
 
     public PayloadOptions(PluginCall call) {
-        Long payloadID = call.getLong("payloadID", null);
+        Long payloadID = call.getLong("payloadID");
         this.setPayloadID(payloadID);
     }
 

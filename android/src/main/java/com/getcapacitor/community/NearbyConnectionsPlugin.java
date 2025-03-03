@@ -29,6 +29,7 @@ import com.getcapacitor.community.classes.events.PayloadTransferUpdateEvent;
 import com.getcapacitor.community.classes.options.AcceptConnectionOptions;
 import com.getcapacitor.community.classes.options.CancelPayloadOptions;
 import com.getcapacitor.community.classes.options.DisconnectOptions;
+import com.getcapacitor.community.classes.options.InitializeOptions;
 import com.getcapacitor.community.classes.options.RejectConnectionOptions;
 import com.getcapacitor.community.classes.options.RequestConnectionOptions;
 import com.getcapacitor.community.classes.options.SendPayloadOptions;
@@ -131,37 +132,9 @@ public class NearbyConnectionsPlugin extends Plugin {
         Callback callback = new Callback(call) {};
 
         try {
-            String endpointName = call.getString("endpointName", null);
-            if (endpointName != null) {
-                config.setEndpointName(endpointName);
-            }
+            InitializeOptions options = new InitializeOptions(call, config);
 
-            String serviceID = call.getString("serviceID", null);
-            if (serviceID != null) {
-                config.setServiceID(serviceID);
-            }
-
-            String strategy = call.getString("strategy", null);
-            if (strategy != null) {
-                config.setStrategy(strategy);
-            }
-
-            Boolean lowPower = call.getBoolean("lowPower", null);
-            if (lowPower != null) {
-                config.setLowPower(lowPower);
-            }
-
-            Boolean autoConnect = call.getBoolean("autoConnect", null);
-            if (autoConnect != null) {
-                config.setAutoConnect(autoConnect);
-            }
-
-            String payload = call.getString("payload", null);
-            if (payload != null) {
-                config.setPayload(payload);
-            }
-
-            implementation.initialize(callback);
+            implementation.initialize(options, callback);
         } catch (Exception exception) {
             callback.error(exception);
         }
@@ -219,7 +192,7 @@ public class NearbyConnectionsPlugin extends Plugin {
         Callback callback = new Callback(call) {};
 
         try {
-            StartDiscoveryOptions options = new StartDiscoveryOptions(call);
+            StartDiscoveryOptions options = new StartDiscoveryOptions(call, config);
 
             implementation.startDiscovery(options, callback);
         } catch (Exception exception) {

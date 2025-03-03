@@ -4,6 +4,8 @@ import static com.getcapacitor.community.NearbyConnectionsHelper.toStrategy;
 
 import android.util.Base64;
 import androidx.annotation.Nullable;
+import com.getcapacitor.PluginCall;
+import com.getcapacitor.community.NearbyConnectionsConfig;
 import com.google.android.gms.nearby.connection.Strategy;
 
 public class InitializeOptions {
@@ -26,22 +28,41 @@ public class InitializeOptions {
     @Nullable
     private byte[] payload;
 
-    public InitializeOptions(
-        @Nullable String endpointName,
-        @Nullable String serviceID,
-        @Nullable String strategy,
-        @Nullable Boolean lowPower,
-        @Nullable Boolean autoConnect,
-        @Nullable byte[] payload
-    ) {
+    public InitializeOptions(PluginCall call, NearbyConnectionsConfig config) {
+        String endpointName = call.getString("endpointName");
+        if (endpointName != null) {
+            config.setEndpointName(endpointName);
+        }
         this.setEndpointName(endpointName);
 
+        String serviceID = call.getString("serviceID");
+        if (serviceID != null) {
+            config.setServiceID(serviceID);
+        }
         this.setServiceID(serviceID);
+
+        String strategy = call.getString("strategy");
+        if (strategy != null) {
+            config.setStrategy(strategy);
+        }
         this.setStrategy(strategy);
 
+        Boolean lowPower = call.getBoolean("lowPower");
+        if (lowPower != null) {
+            config.setLowPower(lowPower);
+        }
         this.setLowPower(lowPower);
 
+        Boolean autoConnect = call.getBoolean("autoConnect");
+        if (autoConnect != null) {
+            config.setAutoConnect(autoConnect);
+        }
         this.setAutoConnect(autoConnect);
+
+        String payload = call.getString("payload");
+        if (payload != null) {
+            config.setPayload(payload);
+        }
         this.setPayload(payload);
     }
 
@@ -67,6 +88,10 @@ public class InitializeOptions {
 
     public void setPayload(@Nullable byte[] payload) {
         this.payload = payload;
+    }
+
+    public void setPayload(@Nullable String payload) {
+        this.payload = Base64.decode(payload, Base64.NO_WRAP);
     }
 
     @Nullable

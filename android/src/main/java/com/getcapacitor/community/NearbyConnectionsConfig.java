@@ -4,7 +4,9 @@ import static com.getcapacitor.community.NearbyConnectionsHelper.toConnectionTyp
 import static com.getcapacitor.community.NearbyConnectionsHelper.toStrategy;
 
 import android.util.Base64;
+
 import androidx.annotation.Nullable;
+
 import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.Strategy;
 
@@ -47,6 +49,10 @@ public class NearbyConnectionsConfig {
         this.lowPower = lowPower;
     }
 
+    public void setConnectionType(@Nullable Integer connectionType) {
+        this.connectionType = connectionType;
+    }
+
     public void setConnectionType(@Nullable String connectionType) {
         this.connectionType = toConnectionType(connectionType);
     }
@@ -56,11 +62,7 @@ public class NearbyConnectionsConfig {
     }
 
     public void setPayload(@Nullable String payload) {
-        if (payload == null) {
-            this.payload = null;
-        } else {
-            this.payload = Payload.fromBytes(Base64.decode(payload, Base64.NO_WRAP));
-        }
+        this.payload = (payload == null) ? null : Payload.fromBytes(Base64.decode(payload, Base64.NO_WRAP));
     }
 
     @Nullable
