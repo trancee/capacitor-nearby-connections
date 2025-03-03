@@ -29,8 +29,8 @@
         <label for="initialize-endpointName">A human readable name for this endpoint, to appear on the remote
           device.</label><br>
         <input type="text" id="initialize-endpointName" name="initialize-endpointName" value="My App" /><br>
-        <label for="initialize-serviceId">An identifier to advertise your app to other endpoints.</label><br>
-        <input type="text" id="initialize-serviceId" name="initialize-serviceId" value="com.example.myapp" /><br>
+        <label for="initialize-serviceID">An identifier to advertise your app to other endpoints.</label><br>
+        <input type="text" id="initialize-serviceID" name="initialize-serviceID" value="com.example.myapp" /><br>
         <label for="initialize-strategy">Sets the `Strategy` to be used when discovering or advertising to Nearby
           devices.</label><br>
         <select id="initialize-strategy" name="initialize-strategy">
@@ -38,12 +38,6 @@
           <option value="star">Star</option>
           <option value="pointToPoint">Point to Point</option>
         </select><br>
-        <select id="initialize-lowPower" name="initialize-lowPower">
-          <option value=""></option>
-          <option value="true">Yes</option>
-          <option value="false">No</option>
-        </select>
-        <label for="initialize-lowPower">Sets whether low power should be used.</label><br>
         <label for="initialize-connectionType">Sets whether the client should disrupt the current connection to
           optimize the transfer or not.</label><br>
         <select id="initialize-connectionType" name="initialize-connectionType">
@@ -52,6 +46,12 @@
           <option value="disruptive">DISRUPTIVE</option>
           <option value="nonDisruptive">NON_DISRUPTIVE</option>
         </select><br>
+        <select id="initialize-lowPower" name="initialize-lowPower">
+          <option value=""></option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+        <label for="initialize-lowPower">Sets whether low power should be used.</label><br>
         <select id="initialize-autoConnect" name="initialize-autoConnect">
           <option value=""></option>
           <option value="true">Yes</option>

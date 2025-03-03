@@ -3,7 +3,6 @@ package com.getcapacitor.community;
 import static com.google.android.gms.nearby.Nearby.getConnectionsClient;
 
 import androidx.annotation.NonNull;
-
 import com.getcapacitor.community.classes.Bandwidth;
 import com.getcapacitor.community.classes.Connection;
 import com.getcapacitor.community.classes.Endpoint;
@@ -34,7 +33,6 @@ import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
-
 import java.util.List;
 
 public class NearbyConnections {
@@ -145,17 +143,17 @@ public class NearbyConnections {
         advertisingOptions.setStrategy(strategy);
 
         connectionsClient
-                .startAdvertising(name, serviceID, connectionLifecycleCallback, advertisingOptions.build())
-                .addOnSuccessListener(unusedResult -> {
-                    isAdvertising = true;
+            .startAdvertising(name, serviceID, connectionLifecycleCallback, advertisingOptions.build())
+            .addOnSuccessListener(unusedResult -> {
+                isAdvertising = true;
 
-                    callback.success();
-                })
-                .addOnFailureListener(exception -> {
-                    isAdvertising = false;
+                callback.success();
+            })
+            .addOnFailureListener(exception -> {
+                isAdvertising = false;
 
-                    callback.error(exception);
-                });
+                callback.error(exception);
+            });
     }
 
     public void stopAdvertising(@NonNull Callback callback) {
@@ -190,17 +188,17 @@ public class NearbyConnections {
         discoveryOptions.setStrategy(strategy);
 
         connectionsClient
-                .startDiscovery(serviceID, endpointDiscoveryCallback, discoveryOptions.build())
-                .addOnSuccessListener(unusedResult -> {
-                    isDiscovering = true;
+            .startDiscovery(serviceID, endpointDiscoveryCallback, discoveryOptions.build())
+            .addOnSuccessListener(unusedResult -> {
+                isDiscovering = true;
 
-                    callback.success();
-                })
-                .addOnFailureListener(exception -> {
-                    isDiscovering = false;
+                callback.success();
+            })
+            .addOnFailureListener(exception -> {
+                isDiscovering = false;
 
-                    callback.error(exception);
-                });
+                callback.error(exception);
+            });
     }
 
     public void stopDiscovery(@NonNull Callback callback) {
@@ -235,9 +233,9 @@ public class NearbyConnections {
         if (lowPower != null) connectionOptions.setLowPower(lowPower);
 
         connectionsClient
-                .requestConnection(name, endpointID, connectionLifecycleCallback, connectionOptions.build())
-                .addOnSuccessListener(callback::success)
-                .addOnFailureListener(callback::error);
+            .requestConnection(name, endpointID, connectionLifecycleCallback, connectionOptions.build())
+            .addOnSuccessListener(callback::success)
+            .addOnFailureListener(callback::error);
     }
 
     public void acceptConnection(@NonNull AcceptConnectionOptions options, @NonNull Callback callback) {
@@ -249,9 +247,9 @@ public class NearbyConnections {
         }
 
         connectionsClient
-                .acceptConnection(endpointID, payloadCallback)
-                .addOnSuccessListener(callback::success)
-                .addOnFailureListener(callback::error);
+            .acceptConnection(endpointID, payloadCallback)
+            .addOnSuccessListener(callback::success)
+            .addOnFailureListener(callback::error);
     }
 
     public void rejectConnection(@NonNull RejectConnectionOptions options, @NonNull Callback callback) {
@@ -295,9 +293,9 @@ public class NearbyConnections {
         }
 
         connectionsClient
-                .sendPayload(endpointIDs, Payload.fromBytes(payload))
-                .addOnSuccessListener(callback::success)
-                .addOnFailureListener(callback::error);
+            .sendPayload(endpointIDs, Payload.fromBytes(payload))
+            .addOnSuccessListener(callback::success)
+            .addOnFailureListener(callback::error);
     }
 
     public void cancelPayload(@NonNull CancelPayloadOptions options, @NonNull Callback callback) {
@@ -360,13 +358,13 @@ public class NearbyConnections {
                     String endpointName = config.getEndpointName();
                     if (!(endpointName == null || endpointName.isEmpty() || endpointName.isBlank())) {
                         connectionsClient
-                                .requestConnection(endpointName, endpointID, connectionLifecycleCallback)
-                                .addOnSuccessListener((Void unused) -> {
-                                    System.out.println("requestConnection::success");
-                                })
-                                .addOnFailureListener((Exception e) -> {
-                                    System.out.println("requestConnection::failure");
-                                });
+                            .requestConnection(endpointName, endpointID, connectionLifecycleCallback)
+                            .addOnSuccessListener((Void unused) -> {
+                                System.out.println("requestConnection::success");
+                            })
+                            .addOnFailureListener((Exception e) -> {
+                                System.out.println("requestConnection::failure");
+                            });
                     }
                 }
 
@@ -479,8 +477,8 @@ public class NearbyConnections {
             Endpoint endpoint = new Endpoint(endpointID, null);
 
             plugin.onPayloadReceived(
-                    endpoint,
-                    new com.getcapacitor.community.classes.Payload(payload.getId(), payload.getType(), payload.asBytes())
+                endpoint,
+                new com.getcapacitor.community.classes.Payload(payload.getId(), payload.getType(), payload.asBytes())
             );
         }
 
@@ -489,13 +487,13 @@ public class NearbyConnections {
             Endpoint endpoint = new Endpoint(endpointID, null);
 
             plugin.onPayloadTransferUpdate(
-                    endpoint,
-                    new com.getcapacitor.community.classes.PayloadTransferUpdate(
-                            update.getPayloadId(),
-                            update.getStatus(),
-                            update.getBytesTransferred(),
-                            update.getTotalBytes()
-                    )
+                endpoint,
+                new com.getcapacitor.community.classes.PayloadTransferUpdate(
+                    update.getPayloadId(),
+                    update.getStatus(),
+                    update.getBytesTransferred(),
+                    update.getTotalBytes()
+                )
             );
         }
     };

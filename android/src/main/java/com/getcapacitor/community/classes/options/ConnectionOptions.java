@@ -4,7 +4,6 @@ import static com.getcapacitor.community.NearbyConnectionsHelper.toConnectionTyp
 import static com.google.android.gms.nearby.connection.ConnectionOptions.convertConnectionTypeToString;
 
 import androidx.annotation.Nullable;
-
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.NearbyConnectionsConfig;
 
@@ -18,7 +17,6 @@ public abstract class ConnectionOptions extends EndpointOptions {
 
     public ConnectionOptions(PluginCall call, @Nullable NearbyConnectionsConfig config) {
         super(call, config);
-
         String connectionType = call.getString("connectionType", (config == null) ? null : getConnectionType(config.getConnectionType()));
         this.setConnectionType(connectionType);
 
@@ -49,6 +47,6 @@ public abstract class ConnectionOptions extends EndpointOptions {
     }
 
     private String getConnectionType(Integer connectionType) {
-        return convertConnectionTypeToString(connectionType);
+        return (connectionType == null) ? null : convertConnectionTypeToString(connectionType);
     }
 }

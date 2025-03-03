@@ -11,7 +11,7 @@ const config: CapacitorConfig = {
     NearbyConnections: {
       endpointName: "My App",
 
-      serviceId: "com.example.myapp",
+      serviceID: "com.example.myapp",
       strategy: Strategy.CLUSTER,
       // lowPower: true,
 

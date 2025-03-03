@@ -91,20 +91,24 @@ declare module '@capacitor/cli' {
       strategy?: Strategy;
 
       /**
-       * Sets whether low power should be used.
-       *
-       * @since 1.0.0
-       * @example true
-       */
-      lowPower?: boolean;
-
-      /**
        * Sets whether the client should disrupt the current connection to optimize the transfer or not.
+       *
+       * Only available on Android.
        *
        * @since 1.0.0
        * @example ConnectionType.BALANCED
        */
       connectionType?: ConnectionType;
+
+      /**
+       * Sets whether low power should be used.
+       *
+       * Only available on Android.
+       *
+       * @since 1.0.0
+       * @example true
+       */
+      lowPower?: boolean;
 
       /**
        * Automatically accept the connection on both sides.
@@ -804,6 +808,8 @@ export interface InitializeOptions {
   /**
    * Sets whether low power should be used.
    *
+   * Only available on Android.
+   *
    * @since 1.0.0
    * @default false
    * @example true
@@ -838,6 +844,8 @@ export interface StartAdvertisingOptions {
   /**
    * Sets whether the client should disrupt the current connection to optimize the transfer or not.
    *
+   * Only available on Android.
+   *
    * @since 1.0.0
    * @default ConnectionType.BALANCED
    * @example ConnectionType.NON_DISRUPTIVE
@@ -846,6 +854,8 @@ export interface StartAdvertisingOptions {
 
   /**
    * Sets whether low power should be used.
+   *
+   * Only available on Android.
    *
    * @since 1.0.0
    * @default false
@@ -857,6 +867,8 @@ export interface StartAdvertisingOptions {
 export interface StartDiscoveryOptions {
   /**
    * Sets whether low power should be used.
+   *
+   * Only available on Android.
    *
    * @since 1.0.0
    * @default false

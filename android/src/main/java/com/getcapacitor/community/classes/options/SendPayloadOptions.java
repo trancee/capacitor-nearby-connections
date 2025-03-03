@@ -46,7 +46,7 @@ public class SendPayloadOptions {
     }
 
     public void setPayload(@Nullable String payload) {
-        this.payload = Base64.decode(payload, Base64.NO_WRAP);
+        this.payload = (payload == null) ? null : Base64.decode(payload, Base64.NO_WRAP);
     }
 
     @Nullable

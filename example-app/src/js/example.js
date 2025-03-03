@@ -4,27 +4,27 @@ window.testInitialize = async () => {
     let options = {}
 
     const endpointName = document.getElementById("initialize-endpointName").value;
-    const serviceId = document.getElementById("initialize-serviceId").value;
+    const serviceID = document.getElementById("initialize-serviceID").value;
     const strategy = document.getElementById("initialize-strategy").value;
-    const lowPower = document.getElementById("initialize-lowPower").value;
     const connectionType = document.getElementById("initialize-connectionType").value;
+    const lowPower = document.getElementById("initialize-lowPower").value;
     const autoConnect = document.getElementById("initialize-autoConnect").value;
     const payload = document.getElementById("initialize-payload").value;
 
     if (endpointName !== undefined && endpointName.length > 0) {
         options.endpointName = endpointName
     }
-    if (serviceId !== undefined && serviceId.length > 0) {
-        options.serviceId = serviceId
+    if (serviceID !== undefined && serviceID.length > 0) {
+        options.serviceID = serviceID
     }
     if (strategy !== undefined && strategy.length > 0) {
         options.strategy = strategy
     }
-    if (lowPower !== undefined && lowPower.length > 0) {
-        options.lowPower = lowPower === "true"
-    }
     if (connectionType !== undefined && connectionType.length > 0) {
         options.connectionType = connectionType
+    }
+    if (lowPower !== undefined && lowPower.length > 0) {
+        options.lowPower = lowPower === "true"
     }
     if (autoConnect !== undefined && autoConnect.length > 0) {
         options.autoConnect = autoConnect === "true"

@@ -4,9 +4,7 @@ import static com.getcapacitor.community.NearbyConnectionsHelper.toConnectionTyp
 import static com.getcapacitor.community.NearbyConnectionsHelper.toStrategy;
 
 import android.util.Base64;
-
 import androidx.annotation.Nullable;
-
 import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.Strategy;
 

@@ -102,8 +102,8 @@ These configuration values are available:
 | **`endpointName`**   | <code>string</code>                                       | A human readable name for this endpoint, to appear on the remote device.                                                                                                                                | 1.0.0 |
 | **`serviceID`**      | <code><a href="#serviceid">ServiceID</a></code>           | An identifier to advertise your app to other endpoints. The `serviceID` value must uniquely identify your app. As a best practice, use the package name of your app (for example, `com.example.myapp`). | 1.0.0 |
 | **`strategy`**       | <code><a href="#strategy">Strategy</a></code>             | Sets the <a href="#strategy">`Strategy`</a> to be used when discovering or advertising to Nearby devices.                                                                                               | 1.0.0 |
-| **`lowPower`**       | <code>boolean</code>                                      | Sets whether low power should be used.                                                                                                                                                                  | 1.0.0 |
-| **`connectionType`** | <code><a href="#connectiontype">ConnectionType</a></code> | Sets whether the client should disrupt the current connection to optimize the transfer or not.                                                                                                          | 1.0.0 |
+| **`connectionType`** | <code><a href="#connectiontype">ConnectionType</a></code> | Sets whether the client should disrupt the current connection to optimize the transfer or not. Only available on Android.                                                                               | 1.0.0 |
+| **`lowPower`**       | <code>boolean</code>                                      | Sets whether low power should be used. Only available on Android.                                                                                                                                       | 1.0.0 |
 | **`autoConnect`**    | <code>boolean</code>                                      | Automatically accept the connection on both sides.                                                                                                                                                      | 1.0.0 |
 | **`payload`**        | <code>string</code>                                       | What payload to send when automatically connecting to each other.                                                                                                                                       | 1.0.0 |
 
@@ -118,8 +118,8 @@ In `capacitor.config.json`:
       "endpointName": "My App",
       "serviceID": "com.example.myapp",
       "strategy": Strategy.STAR,
-      "lowPower": true,
       "connectionType": ConnectionType.BALANCED,
+      "lowPower": true,
       "autoConnect": true,
       "payload": "Hello, World!"
     }
@@ -140,8 +140,8 @@ const config: CapacitorConfig = {
       endpointName: "My App",
       serviceID: "com.example.myapp",
       strategy: Strategy.STAR,
-      lowPower: true,
       connectionType: ConnectionType.BALANCED,
+      lowPower: true,
       autoConnect: true,
       payload: "Hello, World!",
     },
@@ -682,25 +682,25 @@ Called with progress information about an active <a href="#payload">`Payload`</a
 | **`endpointName`** | <code>string</code>                             | A human readable name for this endpoint, to appear on the remote device.                                                                                                                                |                    | 1.0.0 |
 | **`serviceID`**    | <code><a href="#serviceid">ServiceID</a></code> | An identifier to advertise your app to other endpoints. The `serviceID` value must uniquely identify your app. As a best practice, use the package name of your app (for example, `com.example.myapp`). |                    | 1.0.0 |
 | **`strategy`**     | <code><a href="#strategy">Strategy</a></code>   | Sets the <a href="#strategy">`Strategy`</a> to be used when discovering or advertising to Nearby devices.                                                                                               |                    | 1.0.0 |
-| **`lowPower`**     | <code>boolean</code>                            | Sets whether low power should be used.                                                                                                                                                                  | <code>false</code> | 1.0.0 |
+| **`lowPower`**     | <code>boolean</code>                            | Sets whether low power should be used. Only available on Android.                                                                                                                                       | <code>false</code> | 1.0.0 |
 | **`autoConnect`**  | <code>boolean</code>                            | Automatically accept the connection on both sides.                                                                                                                                                      |                    | 1.0.0 |
 | **`payload`**      | <code>string</code>                             | What payload to send when automatically connecting to each other.                                                                                                                                       |                    | 1.0.0 |
 
 
 #### StartAdvertisingOptions
 
-| Prop                 | Type                                                      | Description                                                                                    | Default                              | Since |
-| -------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------ | ----- |
-| **`endpointName`**   | <code>string</code>                                       | A human readable name for this endpoint, to appear on the remote device.                       |                                      | 1.0.0 |
-| **`connectionType`** | <code><a href="#connectiontype">ConnectionType</a></code> | Sets whether the client should disrupt the current connection to optimize the transfer or not. | <code>ConnectionType.BALANCED</code> | 1.0.0 |
-| **`lowPower`**       | <code>boolean</code>                                      | Sets whether low power should be used.                                                         | <code>false</code>                   | 1.0.0 |
+| Prop                 | Type                                                      | Description                                                                                                               | Default                              | Since |
+| -------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ----- |
+| **`endpointName`**   | <code>string</code>                                       | A human readable name for this endpoint, to appear on the remote device.                                                  |                                      | 1.0.0 |
+| **`connectionType`** | <code><a href="#connectiontype">ConnectionType</a></code> | Sets whether the client should disrupt the current connection to optimize the transfer or not. Only available on Android. | <code>ConnectionType.BALANCED</code> | 1.0.0 |
+| **`lowPower`**       | <code>boolean</code>                                      | Sets whether low power should be used. Only available on Android.                                                         | <code>false</code>                   | 1.0.0 |
 
 
 #### StartDiscoveryOptions
 
-| Prop           | Type                 | Description                            | Default            | Since |
-| -------------- | -------------------- | -------------------------------------- | ------------------ | ----- |
-| **`lowPower`** | <code>boolean</code> | Sets whether low power should be used. | <code>false</code> | 1.0.0 |
+| Prop           | Type                 | Description                                                       | Default            | Since |
+| -------------- | -------------------- | ----------------------------------------------------------------- | ------------------ | ----- |
+| **`lowPower`** | <code>boolean</code> | Sets whether low power should be used. Only available on Android. | <code>false</code> | 1.0.0 |
 
 
 #### RequestConnectionOptions
