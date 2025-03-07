@@ -11,6 +11,7 @@
     "start": "vite",
     "build": "vite build",
     "build-android": "vite build && npx cap sync android && npx cap copy android && npx cap open android",
+    "build-ios": "vite build && npx cap sync ios && npx cap copy ios && npx cap open ios",
     "preview": "vite preview"
   },
   "dependencies": {
