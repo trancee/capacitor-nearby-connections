@@ -59,8 +59,6 @@ public class NearbyConnectionsPlugin: CAPPlugin, CAPBridgedPlugin {
      */
 
     @objc func initialize(_ call: CAPPluginCall) {
-        let options = InitializeOptions(call, config)
-
         if let endpointName = call.getString("endpointName") {
             config.setEndpointName(endpointName)
         }
@@ -78,6 +76,8 @@ public class NearbyConnectionsPlugin: CAPPlugin, CAPBridgedPlugin {
         if let payload = call.getString("payload") {
             config.setPayload(payload)
         }
+
+        let options = InitializeOptions(call, config)
 
         implementation.initialize(options, completion: { error in
             if let error = error {

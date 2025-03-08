@@ -10,8 +10,8 @@ let package = Package(
             targets: ["NearbyConnectionsPlugin"])
     ],
     dependencies: [
-        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "7.0.0"),
-        .package(path: "nearby")
+        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "7.0.1"),
+        .package(url: "https://github.com/trancee/nearby.git", branch: "capacitor")
     ],
     targets: [
         .target(

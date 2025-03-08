@@ -38,7 +38,7 @@ import NearbyConnections
      */
 
     @objc public func initialize(_ options: InitializeOptions, completion: @escaping (Error?) -> Void) {
-        if config.getEndpointName() == nil {
+        guard let endpointName = config.getEndpointName() else {
             completion(CustomError.endpointNameMissing)
             return
         }
