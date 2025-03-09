@@ -320,16 +320,16 @@ public class NearbyConnectionsPlugin: CAPPlugin, CAPBridgedPlugin {
         let group = DispatchGroup()
 
         if permissions.contains("wifiState") || permissions.contains("wifiNearby") {
-            //            group.enter()
-            //            store.requestAccess(for: .contacts) { (_, _) in
-            //                group.leave()
-            //            }
+            // group.enter()
+            // LocalNetworkAuthorization.requestAuthorization(completion: { (_) in
+            //     group.leave()
+            // })
         }
         if permissions.contains("bluetoothNearby") || permissions.contains("bluetoothLegacy") {
-            //            group.enter()
-            //            AVCaptureDevice.requestAccess(for: .video) { _ in
-            //                group.leave()
-            //            }
+            // group.enter()
+            // AVCaptureDevice.requestAccess(for: .video) { _ in
+            //     group.leave()
+            // }
         }
         if permissions.contains("location") || permissions.contains("locationCoarse") {
             if let manager = locationManager, CLLocationManager.locationServicesEnabled() {
@@ -446,5 +446,14 @@ public class NearbyConnectionsPlugin: CAPPlugin, CAPBridgedPlugin {
         } else {
             call.resolve()
         }
+    }
+}
+
+extension String {
+    func decode() -> Data? {
+        if let data = Data(base64Encoded: self, options: .ignoreUnknownCharacters) {
+            return data
+        }
+        return nil
     }
 }

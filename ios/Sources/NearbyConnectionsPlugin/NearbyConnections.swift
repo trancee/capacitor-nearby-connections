@@ -469,8 +469,6 @@ extension NearbyConnectionsImpl: DiscovererDelegate {
         // An endpoint was found. We request a connection to it. The endpoint info can be used
         // to provide arbitrary information to the discovering device (e.g. device name or type).
 
-        // discoverer.requestConnection(to: endpointID, using: "My Device".data(using: .utf8)!)
-
         let event = EndpointFoundEvent(endpointID, endpointName: String(data: context, encoding: .utf8)!)
         self.plugin.onEndpointFound(event)
     }

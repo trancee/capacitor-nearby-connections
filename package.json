@@ -1,6 +1,6 @@
 {
   "name": "@capacitor-trancee/nearby-connections",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Uses Nearby Connections peer-to-peer networking API that allows apps to easily discover, connect to, and exchange data with nearby devices in real-time, regardless of network connectivity",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",

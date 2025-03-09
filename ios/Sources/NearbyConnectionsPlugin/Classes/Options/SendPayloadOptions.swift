@@ -24,7 +24,7 @@ import NearbyConnections
         }
 
         if let payload = call.getString("payload") {
-            self.payload = payload.data(using: .utf8)
+            self.payload = payload.decode()
         }
     }
 
