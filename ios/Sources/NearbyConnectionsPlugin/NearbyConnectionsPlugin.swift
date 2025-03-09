@@ -1,6 +1,9 @@
 import Foundation
 import Capacitor
 
+import CoreBluetooth
+import CoreLocation
+
 /**
  * Please read the Capacitor iOS Plugin Development Guide
  * here: https://capacitorjs.com/docs/plugins/ios
@@ -28,7 +31,10 @@ public class NearbyConnectionsPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "sendPayload", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "cancelPayload", returnType: CAPPluginReturnPromise),
 
-        CAPPluginMethod(name: "status", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "status", returnType: CAPPluginReturnPromise),
+
+        CAPPluginMethod(name: "checkPermissions", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "requestPermissions", returnType: CAPPluginReturnPromise)
     ]
 
     public let tag = "NearbyConnectionsPlugin"
@@ -251,6 +257,117 @@ public class NearbyConnectionsPlugin: CAPPlugin, CAPBridgedPlugin {
     /**
      * Permissions
      */
+
+    @objc override public func checkPermissions(_ call: CAPPluginCall) {
+        let wifiState: String = "prompt"
+        let bluetoothState: String
+        let locationState: String
+
+        // The current authorization status for using Bluetooth.
+        switch CBCentralManager.authorization {
+        case .notDetermined:
+            bluetoothState = "prompt"
+        case .restricted, .denied:
+            bluetoothState = "denied"
+        case .allowedAlways:
+            bluetoothState = "granted"
+        @unknown default:
+            bluetoothState = "prompt"
+        }
+
+        let manager = CLLocationManager()
+        // manager.locationServicesEnabled()
+        let authorizationStatus: CLAuthorizationStatus
+
+        if #available(iOS 14, *) {
+            authorizationStatus = manager.authorizationStatus
+        } else {
+            authorizationStatus = CLLocationManager.authorizationStatus()
+        }
+
+        // The current authorization status for using location services.
+        switch authorizationStatus {
+        case .notDetermined:
+            locationState = "prompt"
+        case .restricted, .denied:
+            locationState = "denied"
+        case .authorizedAlways, .authorizedWhenInUse:
+            locationState = "granted"
+        @unknown default:
+            locationState = "prompt"
+        }
+
+        call.resolve([
+            "wifiState": wifiState,
+            "wifiNearby": wifiState,
+            "bluetoothNearby": bluetoothState,
+            "bluetoothLegacy": bluetoothState,
+            "location": locationState,
+            "locationCoarse": locationState
+        ])
+    }
+
+    var permissionCallID: String?
+    var locationManager: CLLocationManager?
+
+    @objc override public func requestPermissions(_ call: CAPPluginCall) {
+        // get the permissions to check or default to all of them
+        var permissions = call.getArray("permissions", String.self) ?? []
+        if permissions.isEmpty {
+            permissions = ["wifiState", "wifiNearby", "bluetoothNearby", "bluetoothLegacy", "location", "locationCoarse"]
+        }
+
+        let group = DispatchGroup()
+
+        if permissions.contains("wifiState") || permissions.contains("wifiNearby") {
+            //            group.enter()
+            //            store.requestAccess(for: .contacts) { (_, _) in
+            //                group.leave()
+            //            }
+        }
+        if permissions.contains("bluetoothNearby") || permissions.contains("bluetoothLegacy") {
+            //            group.enter()
+            //            AVCaptureDevice.requestAccess(for: .video) { _ in
+            //                group.leave()
+            //            }
+        }
+        if permissions.contains("location") || permissions.contains("locationCoarse") {
+            if let manager = locationManager, CLLocationManager.locationServicesEnabled() {
+                let authorizationStatus: CLAuthorizationStatus
+
+                if #available(iOS 14, *) {
+                    authorizationStatus = manager.authorizationStatus
+                } else {
+                    authorizationStatus = CLLocationManager.authorizationStatus()
+                }
+
+                if authorizationStatus == .notDetermined {
+                    group.enter()
+
+                    bridge?.saveCall(call)
+
+                    permissionCallID = call.callbackId
+                    call.options["group"] = group
+
+                    manager.requestWhenInUseAuthorization()
+                }
+            }
+        }
+
+        group.notify(queue: DispatchQueue.main) {
+            self.checkPermissions(call)
+        }
+    }
+
+    public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if let callID = permissionCallID, let call = bridge?.savedCall(withID: callID), let group = call.options["group"] {
+            if let group = group as? DispatchGroup {
+                group.leave()
+            }
+
+            bridge?.releaseCall(call)
+        }
+    }
 
     /**
      * Events

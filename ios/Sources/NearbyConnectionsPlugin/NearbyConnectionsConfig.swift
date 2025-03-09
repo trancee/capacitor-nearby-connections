@@ -1,6 +1,6 @@
 import Capacitor
 
-public struct NearbyConnectionsConfig {
+public class NearbyConnectionsConfig {
     private var endpointName: String?
 
     private var serviceID: String?
@@ -21,21 +21,21 @@ public struct NearbyConnectionsConfig {
         self.payload = config.getString("payload")
     }
 
-    mutating func setEndpointName(_ endpointName: String?) {
+    func setEndpointName(_ endpointName: String?) {
         self.endpointName = endpointName
     }
 
-    mutating func setServiceID(_ serviceID: String?) {
+    func setServiceID(_ serviceID: String?) {
         self.serviceID = serviceID
     }
-    mutating func setStrategy(_ strategy: String?) {
+    func setStrategy(_ strategy: String?) {
         self.strategy = strategy
     }
 
-    mutating func setAutoConnect(_ autoConnect: Bool?) {
+    func setAutoConnect(_ autoConnect: Bool?) {
         self.autoConnect = autoConnect
     }
-    mutating func setPayload(_ payload: String?) {
+    func setPayload(_ payload: String?) {
         self.payload = payload
     }
 
